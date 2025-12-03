@@ -1,0 +1,89 @@
+:root {
+  --background: #0f172a;
+  /* Slate 900 */
+  --surface: #1e293b;
+  /* Slate 800 */
+  --surface-highlight: #334155;
+  /* Slate 700 */
+  --foreground: #f8fafc;
+  /* Slate 50 */
+  --foreground-muted: #94a3b8;
+  /* Slate 400 */
+
+  --primary: #22d3ee;
+  /* Cyan 400 */
+  --primary-hover: #06b6d4;
+  /* Cyan 500 */
+  --primary-glow: 0 0 20px rgba(34, 211, 238, 0.3);
+
+  /* Accent aliases for legacy components */
+  --accent: #22d3ee;
+  --accent-light: #7deffb;
+  --accent-glow: 0 0 30px rgba(34, 211, 238, 0.35);
+
+  --danger: #ef4444;
+  --success: #10b981;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Utility classes for layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-highlight);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}

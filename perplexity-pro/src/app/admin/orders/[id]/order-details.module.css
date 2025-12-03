@@ -1,0 +1,46 @@
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--surface-highlight);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.card h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--foreground);
+    border-bottom: 1px solid var(--surface-highlight);
+    padding-bottom: 0.5rem;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.row span:first-child {
+    color: var(--foreground-muted);
+}
+
+.status {
+    font-weight: 700;
+}
+
+.empty {
+    color: var(--foreground-muted);
+    font-style: italic;
+}

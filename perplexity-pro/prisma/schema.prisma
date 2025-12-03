@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  fileUrl     String?  // Path to the secure digital file
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  refId         String?  @unique // Zarinpal RefID
+  trackingCode  String?  @unique // Short readable tracking code
+  amount        Float
+  quantity      Int      @default(1)
+  status        String   @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  customerEmail String
+  customerPhone String?
+  downloadToken String?  @unique // Secure token for download link
+  downloadCount Int      @default(0)
+  customData    String?  // JSON string of custom field answers
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CustomField {
+  id          String   @id @default(cuid())
+  label       String
+  name        String   @unique // internal key
+  type        String   // text, number, select, etc.
+  required    Boolean  @default(false)
+  options     String?  // JSON string for select options
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
