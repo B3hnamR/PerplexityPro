@@ -1,5 +1,5 @@
 .section {
-    padding: 4rem 2rem;
+    padding: 3rem 1rem;
     position: relative;
     user-select: none;
 }
@@ -11,21 +11,21 @@
 
 .card {
     background: rgba(30, 41, 59, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(34, 211, 238, 0.2);
-    border-radius: 24px;
-    padding: 2.5rem;
-    box-shadow: 0 0 50px rgba(34, 211, 238, 0.1);
-    text-align: center;
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 0 50px rgba(6, 182, 212, 0.1);
 }
 
 .header {
+    text-align: center;
     margin-bottom: 2rem;
 }
 
 .title {
-    font-size: 1.8rem;
-    font-weight: 800;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: white;
     margin-bottom: 0.5rem;
     display: flex;
@@ -40,8 +40,8 @@
 }
 
 .subtitle {
-    color: var(--foreground-muted);
-    font-size: 1rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
 }
 
 .form {
@@ -51,16 +51,17 @@
 
 .input {
     width: 100%;
-    background: var(--background);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 1rem 3.5rem 1rem 1rem;
+    background: #0f172a;
     color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1rem 3rem 1rem 1.5rem;
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s;
     font-family: inherit;
-    user-select: text; /* Allow typing */
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    user-select: text;
 }
 
 .input:focus {
@@ -80,65 +81,67 @@
     left: 0.5rem;
     top: 0.5rem;
     bottom: 0.5rem;
-    background: linear-gradient(to right, var(--primary), #2563eb);
+    background: linear-gradient(to right, var(--primary), var(--secondary));
     color: white;
-    border: none;
-    border-radius: 12px;
     padding: 0 1.5rem;
+    border-radius: 0.75rem;
     font-weight: 700;
+    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    transition: all 0.2s;
-    font-family: inherit;
+    transition: all 0.3s;
 }
 
 .button:disabled {
-    opacity: 0.7;
+    opacity: 0.5;
     cursor: not-allowed;
 }
 
 .button:hover:not(:disabled) {
-    box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+}
+
+.spin {
+    animation: spin 1s linear infinite;
 }
 
 .resultBox {
     background: rgba(15, 23, 42, 0.8);
-    border-radius: 16px;
+    border-radius: 1rem;
     padding: 1.5rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
     text-align: right;
-    animation: fadeIn 0.5s ease-out;
+    animation: fade-in-up 0.5s ease-out;
 }
 
-.resultHeader {
+.errorItem {
+    color: #f87171;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.resultLabel {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.75rem;
     color: var(--primary);
-    font-weight: 600;
     font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .resultText {
     color: #cbd5e1;
     line-height: 1.7;
     white-space: pre-wrap;
-    user-select: text; /* Allow selection of result */
+    user-select: text;
 }
 
-.error {
-    color: var(--danger);
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.9); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+@media (min-width: 768px) {
+    .card { padding: 2.5rem; }
+    .title { font-size: 1.875rem; }
+    .subtitle { font-size: 1rem; }
 }

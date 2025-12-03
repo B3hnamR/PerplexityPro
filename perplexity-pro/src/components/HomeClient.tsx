@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
-import StorySection from "@/components/StorySection"; // Now Features
-import SmartSearchDemo from "@/components/SmartSearchDemo"; // New
+import StorySection from "@/components/StorySection"; // این فایل باید محتوای Features جدید را داشته باشد
+import SmartSearchDemo from "@/components/SmartSearchDemo";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
@@ -30,10 +30,11 @@ export default function HomeClient({ product }: HomeClientProps) {
     };
 
     return (
-        <main>
+        <main className="bg-[#0f172a] min-h-screen">
             <Navbar onPreOrder={handlePreOrder} />
             <Hero onPreOrder={handlePreOrder} />
             <SmartSearchDemo />
+            {/* StorySection در طراحی جدید همان Features است */}
             <StorySection />
             <PricingSection product={product} />
             <FAQSection />

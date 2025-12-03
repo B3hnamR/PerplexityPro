@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import styles from "./FAQSection.module.css";
 
 const faqs = [
     {
         question: "اشتراک Perplexity Pro چه مزیتی دارد؟",
-        answer: "دسترسی به جدیدترین مدل‌های جهان مثل GPT-5.1، Claude Sonnet 4.5 و Gemini 3 Pro، سرعت پاسخگویی بالاتر، اولویت در صف پردازش و قابلیت آپلود فایل‌های حجیم برای آنالیز دقیق.",
+        answer: "دسترسی به جدیدترین مدل‌های جهان مثل GPT-5.1، Claude Sonnet 4.5 و Gemini 3 Pro، سرعت پاسخگویی بالاتر و قابلیت آپلود فایل‌های حجیم برای آنالیز.",
     },
     {
         question: "تحویل و فعال‌سازی چطور انجام می‌شود؟",
@@ -35,35 +35,23 @@ export default function FAQSection() {
         <section className={styles.section} id="faq">
             <div className={styles.container}>
                 <div className={styles.header}>
-                    <div className={styles.badge}><HelpCircle size={16} /> سوالات متداول</div>
-                    <h2 className={styles.title}>قبل از خرید، همه‌چیز را روشن کنید</h2>
+                    <div className={styles.badge}>سوالات متداول</div>
+                    <h2 className={styles.title}>قبل از خرید، همه چیز را روشن کنید</h2>
                 </div>
 
                 <div className={styles.list}>
                     {faqs.map((item, idx) => {
                         const isOpen = openIndex === idx;
                         return (
-                            <motion.div
-                                key={idx}
-                                className={`${styles.item} ${isOpen ? styles.open : ""}`}
-                            >
-                                <button className={styles.question} onClick={() => toggle(idx)}>
-                                    <span>{item.question}</span>
-                                    <ChevronDown size={18} className={styles.icon} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
+                            <div key={idx} className={`${styles.item} ${isOpen ? styles.active : ""}`}>
+                                <button className={styles.questionBtn} onClick={() => toggle(idx)}>
+                                    <span className={styles.questionText}>{item.question}</span>
+                                    {isOpen ? <ChevronUp className={styles.icon} /> : <ChevronDown className={styles.icon} />}
                                 </button>
-                                <AnimatePresence initial={false}>
-                                    {isOpen && (
-                                        <motion.div
-                                            className={styles.answer}
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: "auto", opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                        >
-                                            <p>{item.answer}</p>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </motion.div>
+                                <div className={`${styles.answerWrapper} ${isOpen ? styles.show : ''}`}>
+                                    <p className={styles.answerText}>{item.answer}</p>
+                                </div>
+                            </div>
                         );
                     })}
                 </div>

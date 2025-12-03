@@ -3,17 +3,24 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
-    padding: 1rem 2rem;
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: var(--glass-border);
+    z-index: 50;
+    padding: 1.25rem 0;
     transition: all 0.3s ease;
+    background: transparent;
+}
+
+.scrolled {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
+    padding: 0 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -22,30 +29,51 @@
 .logo {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    font-weight: 800;
-    font-size: 1.25rem;
-    color: white;
+    gap: 0.5rem;
+    cursor: pointer;
 }
 
-.logoIcon {
+.logoIconBg {
     width: 32px;
     height: 32px;
-    /* Ensure logo fits perfectly */
-}
-
-.menu {
+    background: var(--primary);
+    border-radius: 8px;
     display: flex;
-    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(45deg);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
 }
 
-.menuLink {
-    color: var(--foreground-muted);
+.brainIcon {
+    color: white;
+    transform: rotate(-45deg);
+}
+
+.logoText {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 0.05em;
+}
+
+.logoHighlight {
+    color: var(--primary);
+}
+
+.desktopMenu {
+    display: none;
+}
+
+.navLink {
+    color: #cbd5e1;
     font-size: 0.95rem;
+    font-weight: 500;
     transition: color 0.2s;
+    margin-left: 2rem;
 }
 
-.menuLink:hover {
+.navLink:hover {
     color: var(--primary);
 }
 
@@ -55,29 +83,23 @@
     gap: 1rem;
 }
 
-.cartButton {
+.cartBtn {
     position: relative;
-    color: var(--foreground);
-    background: rgba(255, 255, 255, 0.05);
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    color: #cbd5e1;
+    transition: color 0.2s;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
 }
 
-.cartButton:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--primary);
+.cartBtn:hover {
+    color: white;
 }
 
-.cartBadge {
+.badge {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: var(--danger);
+    background: #ef4444;
     color: white;
     font-size: 0.7rem;
     width: 18px;
@@ -89,23 +111,78 @@
     font-weight: bold;
 }
 
-.ctaButton {
-    background: linear-gradient(to right, var(--primary), #0ea5e9);
-    color: #0f172a;
-    padding: 0.6rem 1.2rem;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.9rem;
+.ctaBtn {
+    display: none;
+}
+
+.mobileToggle {
+    display: block;
+    background: transparent;
     border: none;
+    color: #cbd5e1;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.ctaButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+/* Mobile Menu */
+.mobileMenu {
+    background: #0f172a;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
 }
 
-@media (max-width: 768px) {
-    .menu { display: none; }
+.mobileLink {
+    color: #cbd5e1;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.mobileLink:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--primary);
+}
+
+.mobileCta {
+    background: var(--primary); /* using standard primary */
+    color: white;
+    padding: 0.75rem;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    margin-top: 0.5rem;
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .desktopMenu {
+        display: flex;
+    }
+    
+    .ctaBtn {
+        display: block;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        color: white;
+        padding: 0.6rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+        transition: transform 0.2s;
+    }
+    
+    .ctaBtn:hover {
+        transform: scale(1.05);
+    }
+
+    .mobileToggle {
+        display: none;
+    }
 }

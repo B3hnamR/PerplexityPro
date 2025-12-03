@@ -3,10 +3,9 @@ import { Vazirmatn } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 
-// تنظیم فونت وزیرمتن با متغیر CSS
 const vazirmatn = Vazirmatn({ 
   subsets: ["arabic", "latin"],
-  variable: "--font-vazir", // تعریف متغیر
+  variable: "--font-vazir",
   display: "swap",
 });
 

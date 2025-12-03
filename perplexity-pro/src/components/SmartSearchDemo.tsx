@@ -18,34 +18,35 @@ export default function SmartSearchDemo() {
     setResult('');
     setError('');
 
-    // شبیه‌سازی درخواست برای دمو (چون کلید API در سمت کلاینت امن نیست)
-    // در نسخه واقعی باید به API Route نکست.جی‌اس وصل شود
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // شبیه‌سازی برای امنیت سمت کلاینت.
+      // در نسخه نهایی این بخش را به API Route خودتان متصل کنید.
+      await new Promise(resolve => setTimeout(resolve, 2500));
       
-      // پاسخ‌های نمایشی برای دمو
       const mockResponses = [
-          "هوش مصنوعی مولد (Generative AI) شاخه‌ای از هوش مصنوعی است که می‌تواند محتوای جدیدی از جمله متن، تصویر، صدا و ویدئو تولید کند. مدل‌هایی مانند GPT-4 و Gemini نمونه‌هایی از این تکنولوژی هستند.",
-          "برای یادگیری برنامه‌نویسی پایتون، پیشنهاد می‌کنم ابتدا با مفاهیم پایه مثل متغیرها، حلقه‌ها و توابع شروع کنید و سپس سراغ فریم‌ورک‌هایی مثل Django یا کتابخانه‌هایی مثل Pandas بروید.",
-          "پرپلکسیتی (Perplexity) یک موتور پاسخگویی هوشمند است که با ترکیب جستجوی وب و مدل‌های زبانی بزرگ (LLM) پاسخ‌های دقیق و به‌روز به کاربران ارائه می‌دهد."
+          "هوش مصنوعی مولد (Generative AI) شاخه‌ای قدرتمند است که محتوای جدید تولید می‌کند. مدل‌هایی مانند Gemini 3 Pro و GPT-5.1 پیشگامان این عرصه هستند که در Perplexity Pro به آنها دسترسی دارید.",
+          "برای شروع برنامه‌نویسی پایتون، پیشنهاد می‌شود با مفاهیم متغیرها و حلقه‌ها شروع کنید. منابعی مانند FreeCodeCamp و مستندات رسمی پایتون عالی هستند.",
+          "پرپلکسیتی پرو ترکیبی از موتور جستجو و مدل‌های زبانی است که به شما امکان می‌دهد دقیق‌ترین و به‌روزترین پاسخ‌ها را با ذکر منبع دریافت کنید."
       ];
       
       setResult(mockResponses[Math.floor(Math.random() * mockResponses.length)]);
+
     } catch (err) {
-      setError('متاسفانه در برقراری ارتباط مشکلی پیش آمد.');
+      console.error(err);
+      setError('متاسفانه در برقراری ارتباط با هوش مصنوعی مشکلی پیش آمد. لطفاً دوباره تلاش کنید.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className={styles.section} id="demo">
+    <section id="demo" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.card}>
           <div className={styles.header}>
             <h2 className={styles.title}>
               <Sparkles className={styles.sparkle} />
-              تجربه قدرت هوش مصنوعی
+              تجربه قدرت Gemini
             </h2>
             <p className={styles.subtitle}>
               همین حالا سوال خود را بپرسید و پاسخ هوشمند دریافت کنید.
@@ -83,13 +84,13 @@ export default function SmartSearchDemo() {
           {(result || error) && (
             <div className={styles.resultBox}>
               {error ? (
-                <div className={`${styles.resultHeader} ${styles.error}`}>
+                <div className={styles.errorItem}>
                   <Shield size={18} />
                   {error}
                 </div>
               ) : (
                 <div className={styles.resultContent}>
-                  <div className={styles.resultHeader}>
+                  <div className={styles.resultLabel}>
                     <Brain size={16} />
                     <span>پاسخ هوش مصنوعی:</span>
                   </div>
