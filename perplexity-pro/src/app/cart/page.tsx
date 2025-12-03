@@ -10,10 +10,11 @@ import {
     Plus,
     ShoppingBag,
     Trash2,
+    ShieldCheck,
+    Check
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import styles from "./cart.module.css";
 
 export default function CartPage() {
     const { items, removeItem, updateQuantity, total, count } = useCart();
@@ -21,122 +22,157 @@ export default function CartPage() {
     const formatPrice = (value: number) => value.toLocaleString("fa-IR");
 
     return (
-        <main className={styles.main}>
+        <main className="min-h-screen bg-[#0f172a] text-white pb-20 font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+            {/* Navbar is included directly for consistent layout */}
             <Navbar onPreOrder={() => setIsCheckoutOpen(true)} />
 
-            <div className={styles.container}>
-                <div className={styles.pageHeader}>
+            <div className="pt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Page Header */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fade-in">
                     <div>
-                        <p className={styles.kicker}>پلن حرفه‌ای</p>
-                        <h1>سبد خرید شما</h1>
-                        <p className={styles.lead}>سبد را یک نگاه مرور کنید و در چند گام کوتاه پرداخت را نهایی کنید؛ همه چیز در تم Perplexity Pro با پرداخت امن و تحویل فوری.</p>
+                        <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-3">
+                            پلن حرفه‌ای
+                        </span>
+                        <h1 className="text-3xl md:text-4xl font-black text-white mb-2">سبد خرید شما</h1>
+                        <p className="text-gray-400 max-w-2xl leading-relaxed">
+                            سبد را یک نگاه مرور کنید و در چند گام کوتاه پرداخت را نهایی کنید؛ همه چیز در تم Perplexity Pro با پرداخت امن و تحویل فوری.
+                        </p>
                     </div>
-                    <div className={styles.reassurance}>
-                        <span>پرداخت امن و رمزگذاری‌شده</span>
-                        <span className={styles.dot} />
-                        <span>پشتیبانی ۲۴/۷ و تحویل سریع</span>
+                    
+                    <div className="flex items-center gap-3 bg-[#1e293b]/50 border border-white/5 px-4 py-3 rounded-xl backdrop-blur-sm">
+                        <ShieldCheck className="text-emerald-400" size={20} />
+                        <div className="flex flex-col text-xs text-gray-400">
+                            <span className="text-gray-300 font-bold">پرداخت امن و تضمینی</span>
+                            <span>رمزگذاری شده با SSL ۲۵۶ بیتی</span>
+                        </div>
                     </div>
                 </div>
 
                 {items.length === 0 ? (
-                    <div className={styles.emptyState}>
-                        <div className={styles.emptyIconWrapper}>
-                            <ShoppingBag size={64} className={styles.emptyIcon} />
+                    /* Empty State */
+                    <div className="bg-[#1e293b]/30 border border-white/5 rounded-3xl p-12 text-center max-w-2xl mx-auto animate-fade-in-up">
+                        <div className="w-24 h-24 bg-[#1e293b] rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/5 shadow-lg">
+                            <ShoppingBag size={48} className="text-gray-600" />
                         </div>
-                        <p className={styles.emptyText}>سبد خرید شما خالی است. برای ادامه یک اشتراک را انتخاب کنید.</p>
-                        <Link href="/" className={styles.backButton}>
+                        <h2 className="text-2xl font-bold text-white mb-2">سبد خرید شما خالی است</h2>
+                        <p className="text-gray-400 mb-8">هنوز هیچ محصولی انتخاب نکرده‌اید. برای دسترسی به قابلیت‌های هوش مصنوعی، یک اشتراک تهیه کنید.</p>
+                        <Link 
+                            href="/" 
+                            className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white px-6 py-3 rounded-xl font-bold transition-all"
+                        >
                             <ArrowRight size={20} />
                             بازگشت به صفحه اصلی
                         </Link>
                     </div>
                 ) : (
-                    <div className={styles.contentWrapper}>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Right Column: Cart Items */}
-                        <div className={styles.itemsSection}>
-                            <div className={styles.sectionHeader}>
-                                <h2>جزئیات سفارش</h2>
-                                <span className={styles.itemCount}>{formatPrice(count)} مورد</span>
-                            </div>
+                        <div className="lg:col-span-2 space-y-4 animate-fade-in-up">
+                            <div className="bg-[#1e293b]/40 border border-white/5 rounded-2xl p-6">
+                                <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+                                    <h2 className="text-lg font-bold text-white">جزئیات سفارش</h2>
+                                    <span className="bg-white/5 px-3 py-1 rounded-lg text-sm text-gray-400">
+                                        {formatPrice(count)} مورد
+                                    </span>
+                                </div>
 
-                            <div className={styles.itemsList}>
-                                {items.map((item) => (
-                                    <div key={item.id} className={styles.item}>
-                                        <div className={styles.itemImage}>
-                                            <img src="/perplexity-icon.svg" alt="Product" />
-                                        </div>
-                                        <div className={styles.itemDetails}>
-                                            <h3>{item.name}</h3>
-                                            <p className={styles.itemMeta}>اشتراک حرفه‌ای با دسترسی کامل</p>
-                                            <div className={styles.itemPriceMobile}>
-                                                {formatPrice(item.price)} تومان
+                                <div className="space-y-6">
+                                    {items.map((item) => (
+                                        <div key={item.id} className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/5 last:border-0 last:pb-0">
+                                            {/* Product Image Placeholder */}
+                                            <div className="w-20 h-20 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-xl border border-white/10 flex items-center justify-center flex-shrink-0">
+                                                <img src="/perplexity-icon.svg" alt="Product" className="w-10 h-10 opacity-80" onError={(e) => e.currentTarget.style.display='none'} />
+                                            </div>
+                                            
+                                            <div className="flex-1 text-center sm:text-right w-full">
+                                                <h3 className="font-bold text-lg text-white mb-1">{item.name}</h3>
+                                                <p className="text-sm text-gray-400 mb-3 sm:mb-0">اشتراک حرفه‌ای با دسترسی کامل</p>
+                                                <div className="sm:hidden font-bold text-cyan-400 text-lg mt-2">
+                                                    {formatPrice(item.price)} تومان
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                                                {/* Quantity Controls */}
+                                                <div className="flex items-center bg-[#0f172a] rounded-lg border border-white/10 p-1">
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
+                                                    <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                                        disabled={item.quantity <= 1}
+                                                    >
+                                                        <Minus size={14} />
+                                                    </button>
+                                                </div>
+
+                                                <div className="hidden sm:block font-bold text-lg text-white min-w-[120px] text-left pl-4">
+                                                    {formatPrice(item.price * item.quantity)} <span className="text-sm text-gray-500 font-normal">تومان</span>
+                                                </div>
+
+                                                <button
+                                                    onClick={() => removeItem(item.id)}
+                                                    className="w-10 h-10 flex items-center justify-center text-red-400 hover:bg-red-500/10 rounded-xl border border-transparent hover:border-red-500/20 transition-all"
+                                                    title="حذف"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
                                             </div>
                                         </div>
-
-                                        <div className={styles.quantityControl}>
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                className={styles.qtyBtn}
-                                            >
-                                                <Plus size={14} />
-                                            </button>
-                                            <span className={styles.qtyValue}>{item.quantity}</span>
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                className={styles.qtyBtn}
-                                                disabled={item.quantity <= 1}
-                                            >
-                                                <Minus size={14} />
-                                            </button>
-                                        </div>
-
-                                        <div className={styles.itemPrice}>
-                                            {formatPrice(item.price * item.quantity)} تومان
-                                        </div>
-
-                                        <button
-                                            onClick={() => removeItem(item.id)}
-                                            className={styles.deleteButton}
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
                         {/* Left Column: Summary */}
-                        <div className={styles.summarySection}>
-                            <div className={styles.summaryCard}>
-                                <div className={styles.couponSection}>
-                                    <input type="text" placeholder="کد تخفیف دارید؟" className={styles.couponInput} />
-                                    <button className={styles.couponButton}>اعمال</button>
+                        <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+                            <div className="bg-[#1e293b] border border-white/10 rounded-2xl p-6 sticky top-24 shadow-xl">
+                                {/* Coupon Section */}
+                                <div className="flex gap-2 mb-6">
+                                    <input 
+                                        type="text" 
+                                        placeholder="کد تخفیف دارید؟" 
+                                        className="flex-1 bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors placeholder-gray-600"
+                                    />
+                                    <button className="bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-400 px-4 rounded-xl font-bold text-sm transition-all">
+                                        اعمال
+                                    </button>
                                 </div>
 
-                                <div className={styles.summaryRows}>
-                                    <div className={styles.summaryRow}>
-                                        <span>قیمت کالاها ({formatPrice(count)}):</span>
-                                        <span>{formatPrice(total)} تومان</span>
+                                <div className="space-y-3 mb-6 pb-6 border-b border-white/5">
+                                    <div className="flex justify-between text-gray-400 text-sm">
+                                        <span>قیمت کالاها ({formatPrice(count)})</span>
+                                        <span className="text-white font-medium">{formatPrice(total)} تومان</span>
                                     </div>
-                                    <div className={`${styles.summaryRow} ${styles.discount}`}>
-                                        <span>تخفیف:</span>
-                                        <span>۰ تومان</span>
-                                    </div>
-                                    <div className={styles.divider} />
-                                    <div className={`${styles.summaryRow} ${styles.total}`}>
-                                        <span>جمع نهایی:</span>
-                                        <span>{formatPrice(total)} تومان</span>
+                                    <div className="flex justify-between text-gray-400 text-sm">
+                                        <span>تخفیف</span>
+                                        <span className="text-red-400">۰ تومان</span>
                                     </div>
                                 </div>
 
-                                <p className={styles.note}>
-                                    پرداخت شما در بستر امن انجام می‌شود و لینک دسترسی بلافاصله بعد از تکمیل پرداخت فعال خواهد شد.
-                                </p>
+                                <div className="flex justify-between items-center mb-8">
+                                    <span className="font-bold text-lg text-white">جمع نهایی</span>
+                                    <div className="text-right">
+                                        <span className="block text-2xl font-black text-cyan-400">{formatPrice(total)}</span>
+                                        <span className="text-xs text-gray-500">تومان</span>
+                                    </div>
+                                </div>
+
+                                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-6 text-xs text-blue-200 leading-relaxed flex gap-3">
+                                    <div className="flex-shrink-0 mt-0.5 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] font-bold text-[#0f172a]">i</div>
+                                    پرداخت شما در بستر امن زرین‌پال انجام می‌شود و لینک دسترسی بلافاصله بعد از تکمیل پرداخت به ایمیل شما ارسال خواهد شد.
+                                </div>
 
                                 <button
-                                    className={styles.checkoutButton}
                                     onClick={() => setIsCheckoutOpen(true)}
+                                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2"
                                 >
-                                    ادامه ثبت سفارش <ArrowLeft size={18} />
+                                    ادامه ثبت سفارش <ArrowLeft size={20} />
                                 </button>
                             </div>
                         </div>
@@ -148,4 +184,3 @@ export default function CartPage() {
         </main>
     );
 }
-

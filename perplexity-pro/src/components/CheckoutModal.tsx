@@ -1,13 +1,9 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import Link from "next/link";
-import { X, Lock, CheckCircle } from "lucide-react";
-import Button from "./ui/Button";
-import styles from "./CheckoutModal.module.css";
+import { X, Lock, CheckCircle, ArrowLeft, CreditCard } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useRouter } from "next/navigation";
 
 interface CheckoutModalProps {
     isOpen: boolean;
@@ -15,236 +11,125 @@ interface CheckoutModalProps {
     isCartCheckout?: boolean;
 }
 
-interface CustomField {
-    id: string;
-    label: string;
-    name: string;
-    type: string;
-    required: boolean;
-    options: string | null;
-}
-
 export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false }: CheckoutModalProps) {
+    const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [customFields, setCustomFields] = useState<CustomField[]>([]);
-    const [product, setProduct] = useState({ name: "اشتراک Perplexity Pro", price: 299000 });
-    const { addItem, items } = useCart();
-    const [quantity, setQuantity] = useState(1);
+    const { total, clearCart } = useCart();
+    const router = useRouter();
 
-    const [formData, setFormData] = useState({
-        email: "",
-        mobile: "",
-        customData: {} as Record<string, any>,
-    });
-
+    // Reset state when modal opens
     useEffect(() => {
         if (isOpen) {
-            axios.get("/api/admin/fields").then((res) => setCustomFields(res.data));
-            axios.get("/api/admin/product").then((res) => res.data && setProduct(res.data));
-
-            const cartQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-            if (cartQuantity > 0) {
-                setQuantity(cartQuantity);
-            }
+            setStep(1);
+            setLoading(false);
         }
-    }, [isOpen, items]);
+    }, [isOpen]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        if (name === "email" || name === "mobile") {
-            setFormData((prev) => ({ ...prev, [name]: value }));
-        } else {
-            setFormData((prev) => ({
-                ...prev,
-                customData: { ...prev.customData, [name]: value },
-            }));
-        }
-    };
+    if (!isOpen) return null;
 
     const handlePayment = async () => {
-        const checkoutQuantity = isCartCheckout
-            ? items.reduce((sum, item) => sum + item.quantity, 0)
-            : quantity;
-
-        if (!formData.email.trim() || !formData.mobile.trim()) {
-            alert("ایمیل و شماره موبایل را وارد کنید.");
-            return;
-        }
-        const missingRequired = customFields.filter(
-            (f) => f.required && !String((formData.customData as any)[f.name] || "").trim()
-        );
-        if (missingRequired.length > 0) {
-            alert("لطفاً فیلدهای اجباری را کامل کنید.");
-            return;
-        }
-
         setLoading(true);
         try {
-            const response = await axios.post("/api/payment/request", {
-                amount: product.price * checkoutQuantity,
-                description: `خرید ${checkoutQuantity} عدد ${product.name}`,
-                email: formData.email,
-                mobile: formData.mobile,
-                customData: formData.customData,
-                quantity: checkoutQuantity,
-            });
-
-            if (response.data.url) {
-                window.location.href = response.data.url;
-            }
+            // شبیه‌سازی درخواست پرداخت
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // در سناریوی واقعی اینجا به درگاه بانک ریدایرکت می‌شوید
+            // فعلاً فرض می‌کنیم پرداخت موفق بوده:
+            clearCart();
+            router.push('/payment/success');
+            onClose();
         } catch (error) {
             console.error("Payment failed", error);
-            alert("پرداخت انجام نشد، لطفاً دوباره تلاش کنید یا اطلاعات را بررسی کنید.");
-        } finally {
             setLoading(false);
         }
     };
 
-    const [addedToCart, setAddedToCart] = useState(false);
-
-    const handleAddToCart = () => {
-        addItem({
-            id: "perplexity-pro-1year",
-            name: product.name,
-            price: product.price,
-            quantity: quantity,
-        });
-        setAddedToCart(true);
-        setTimeout(() => {
-            setAddedToCart(false);
-            onClose();
-        }, 1000);
-    };
-
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    className={styles.backdrop}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onClick={onClose}
-                >
-                    <motion.div
-                        className={styles.modal}
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.9, opacity: 0 }}
-                        onClick={(e) => e.stopPropagation()}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+            {/* Backdrop */}
+            <div 
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                onClick={onClose}
+            ></div>
+
+            {/* Modal Content */}
+            <div className="relative w-full max-w-lg bg-[#1e293b] border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-white/5 bg-[#0f172a]/50">
+                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                        <Lock className="text-cyan-400" size={18} />
+                        تکمیل خرید
+                    </h3>
+                    <button 
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/5 rounded-lg"
                     >
-                        <button className={styles.closeButton} onClick={onClose}>
-                            <X size={24} />
-                        </button>
+                        <X size={24} />
+                    </button>
+                </div>
 
-                        <div className={styles.content}>
-                            <div className={styles.productSummary}>
-                                <div className={styles.summaryTop}>
-                                    <h3>{product.name}</h3>
-                                    <span className={styles.priceBadge}>{(product.price * quantity).toLocaleString("fa-IR")} تومان</span>
-                                </div>
-                                <p className={styles.subtext}>تحویل دیجیتال فوری ۲۴/۷ و پشتیبانی</p>
-
-                                <div className={styles.quantityControl} data-readonly={isCartCheckout}>
-                                    <span className={styles.qtyValue}>{quantity} عدد</span>
+                {/* Body */}
+                <div className="p-6 md:p-8">
+                    {step === 1 && (
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <p className="text-gray-400 mb-2">مبلغ قابل پرداخت</p>
+                                <div className="text-4xl font-black text-white tracking-tight">
+                                    {isCartCheckout ? total.toLocaleString("fa-IR") : "۳۹۸,۰۰۰"} 
+                                    <span className="text-lg font-medium text-gray-500 mr-2">تومان</span>
                                 </div>
                             </div>
 
-                            <div className={styles.formSection}>
-                                <div className={styles.formHeader}>
-                                    <h2>اطلاعات خریدار</h2>
+                            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex gap-3">
+                                <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0 text-blue-400">
+                                    <CreditCard size={20} />
                                 </div>
-
-                                <div className={styles.inputGrid}>
-                                    <div className={styles.inputGroup}>
-                                        <label>ایمیل</label>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            placeholder="shoma@example.com"
-                                            value={formData.email}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
-
-                                    <div className={styles.inputGroup}>
-                                        <label>شماره موبایل</label>
-                                        <input
-                                            type="tel"
-                                            name="mobile"
-                                            placeholder="09123456789"
-                                            value={formData.mobile}
-                                            onChange={handleInputChange}
-                                        />
-                                    </div>
+                                <div className="text-sm">
+                                    <p className="text-white font-bold mb-1">درگاه پرداخت امن زرین‌پال</p>
+                                    <p className="text-blue-200/80 leading-relaxed text-xs">
+                                        اطلاعات کارت شما در بستری امن پردازش می‌شود.
+                                    </p>
                                 </div>
-
-                                {customFields.map((field) => (
-                                    <div key={field.id} className={styles.inputGroup}>
-                                        <label>{field.label}</label>
-                                        {field.type === "select" && field.options ? (
-                                            <select
-                                                name={field.name}
-                                                required={field.required}
-                                                onChange={handleInputChange}
-                                            >
-                                                <option value="">یک گزینه را انتخاب کنید...</option>
-                                                {JSON.parse(field.options).map((opt: string) => (
-                                                    <option key={opt} value={opt}>{opt}</option>
-                                                ))}
-                                            </select>
-                                        ) : field.type === "textarea" ? (
-                                            <textarea
-                                                name={field.name}
-                                                required={field.required}
-                                                onChange={handleInputChange}
-                                            />
-                                        ) : (
-                                            <input
-                                                type={field.type}
-                                                name={field.name}
-                                                required={field.required}
-                                                onChange={handleInputChange}
-                                            />
-                                        )}
-                                    </div>
-                                ))}
-
-                                <div className={styles.actionButtons}>
-                                    {!isCartCheckout && (
-                                        <Button
-                                            size="lg"
-                                            className={styles.addToCartButton}
-                                            onClick={handleAddToCart}
-                                            disabled={loading || addedToCart}
-                                        >
-                                            {addedToCart ? (
-                                                <>
-                                                    <CheckCircle size={18} /> به سبد اضافه شد
-                                                </>
-                                            ) : (
-                                                "افزودن به سبد"
-                                            )}
-                                        </Button>
-                                    )}
-                                    <Button
-                                        size="lg"
-                                        className={styles.payButton}
-                                        onClick={handlePayment}
-                                        disabled={loading}
-                                    >
-                                        {loading ? "در حال پردازش..." : "پرداخت و ادامه"} <Lock size={18} />
-                                    </Button>
-                                </div>
-
-                                <p className={styles.secureNote}>
-                                    <Link href="/terms">با پرداخت، قوانین سایت</Link> را می‌پذیرید.
-                                </p>
                             </div>
+
+                            <div className="space-y-3">
+                                <label className="block text-sm text-gray-400 mb-1">شماره موبایل (برای دریافت لایسنس)</label>
+                                <input 
+                                    type="tel" 
+                                    placeholder="0912..." 
+                                    className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all text-left dir-ltr"
+                                />
+                            </div>
+
+                            <button
+                                onClick={handlePayment}
+                                disabled={loading}
+                                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-cyan-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {loading ? (
+                                    <>
+                                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                        در حال انتقال...
+                                    </>
+                                ) : (
+                                    <>
+                                        پرداخت و فعال‌سازی آنی <ArrowLeft size={20} />
+                                    </>
+                                )}
+                            </button>
                         </div>
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 bg-[#0f172a]/80 text-center text-xs text-gray-500 border-t border-white/5">
+                    <p className="flex items-center justify-center gap-1">
+                        <CheckCircle size={12} className="text-emerald-500" />
+                        گارانتی بازگشت وجه تا ۷ روز
+                    </p>
+                </div>
+            </div>
+        </div>
     );
 }

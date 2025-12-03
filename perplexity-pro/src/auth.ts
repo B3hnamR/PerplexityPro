@@ -61,4 +61,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session: {
         strategy: "jwt",
     },
+    trustHost: true, // ✅ این خط مشکل UntrustedHost را حل می‌کند
 });

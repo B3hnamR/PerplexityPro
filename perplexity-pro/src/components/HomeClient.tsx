@@ -5,7 +5,7 @@ import { useCart } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import SmartSearchDemo from "@/components/SmartSearchDemo";
-import StorySection from "@/components/StorySection"; // همان بخش Features جدید
+import StorySection from "@/components/StorySection"; // Features section
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -30,14 +30,26 @@ export default function HomeClient({ product }: HomeClientProps) {
     };
 
     return (
-        <main className="bg-[#0f172a] min-h-screen text-white overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
+        <main className="bg-[#0f172a] min-h-screen text-white overflow-x-hidden font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
             <Navbar onPreOrder={handlePreOrder} />
-            <Hero onPreOrder={handlePreOrder} />
-            <SmartSearchDemo />
-            <StorySection />
-            <PricingSection product={product} />
-            <FAQSection />
-            <TestimonialsSection />
+            
+            <div className="space-y-0">
+                <Hero onPreOrder={handlePreOrder} />
+                
+                {/* Add some spacing or dividers if needed between sections */}
+                <div className="relative z-20">
+                    <SmartSearchDemo />
+                </div>
+                
+                <StorySection />
+                
+                <PricingSection product={product} />
+                
+                <FAQSection />
+                
+                <TestimonialsSection />
+            </div>
+            
             <Footer />
             <ScrollToTop />
         </main>
