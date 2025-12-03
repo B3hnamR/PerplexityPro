@@ -1,66 +1,63 @@
 import { prisma } from "@/lib/db";
-import styles from "./order-details.module.css";
-import { notFound } from "next/navigation";
+import styles from "../orders.module.css";
+import Link from "next/link";
 
-export default async function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
+interface Props {
+    params: { id: string };
+}
+
+export const dynamic = "force-dynamic";
+
+export default async function OrderDetailPage({ params }: Props) {
     const order = await prisma.order.findUnique({
-        where: { id },
+        where: { id: params.id },
+        include: { downloads: true } as any,
     });
 
     if (!order) {
-        notFound();
+        return <div className={styles.container}><p>سفارش یافت نشد.</p></div>;
     }
 
-    const customData = order.customData ? JSON.parse(order.customData) : {};
-
     return (
-        <div>
+        <div className={styles.container}>
             <h1 className={styles.title}>جزئیات سفارش</h1>
-
-            <div className={styles.grid}>
-                <div className={styles.card}>
-                    <h2>اطلاعات مشتری</h2>
-                    <div className={styles.row}>
-                        <span>ایمیل:</span>
-                        <span>{order.customerEmail}</span>
-                    </div>
-                    <div className={styles.row}>
-                        <span>موبایل:</span>
-                        <span>{order.customerPhone || "نامشخص"}</span>
-                    </div>
+            <div className={styles.detailCard}>
+                <div className={styles.detailGrid}>
+                    <div><strong>شناسه:</strong> {order.id}</div>
+                    <div><strong>کد پیگیری:</strong> {order.trackingCode || "-"}</div>
+                    <div><strong>ایمیل:</strong> {order.customerEmail}</div>
+                    <div><strong>مبلغ:</strong> {order.amount.toLocaleString("fa-IR")} تومان</div>
+                    <div><strong>تعداد:</strong> {order.quantity}</div>
+                    <div><strong>وضعیت:</strong> {order.status}</div>
+                    <div><strong>تاریخ:</strong> {new Date(order.createdAt).toLocaleString("fa-IR")}</div>
                 </div>
-
-                <div className={styles.card}>
-                    <h2>اطلاعات پرداخت</h2>
-                    <div className={styles.row}>
-                        <span>مبلغ:</span>
-                        <span>{order.amount.toLocaleString()} تومان</span>
+                {order.customData && (
+                    <div className={styles.detailBlock}>
+                        <strong>اطلاعات سفارشی:</strong>
+                        <pre className={styles.pre}>{order.customData}</pre>
                     </div>
-                    <div className={styles.row}>
-                        <span>وضعیت:</span>
-                        <span className={styles.status}>{order.status === "PAID" ? "پرداخت شده" : "در انتظار"}</span>
-                    </div>
-                    <div className={styles.row}>
-                        <span>کد پیگیری:</span>
-                        <span>{order.refId || "نامشخص"}</span>
-                    </div>
-                </div>
-
-                <div className={styles.card}>
-                    <h2>فیلدهای دلخواه</h2>
-                    {Object.entries(customData).length > 0 ? (
-                        Object.entries(customData).map(([key, value]) => (
-                            <div key={key} className={styles.row}>
-                                <span>{key}:</span>
-                                <span>{String(value)}</span>
-                            </div>
-                        ))
-                    ) : (
-                        <p className={styles.empty}>داده اضافی وجود ندارد.</p>
-                    )}
-                </div>
+                )}
             </div>
+
+            <div className={styles.detailCard}>
+                <h2>لینک‌های تحویل</h2>
+                {order.downloads.length === 0 ? (
+                    <p className={styles.muted}>لینکی ثبت نشده است.</p>
+                ) : (
+                    <div className={styles.linksList}>
+                        {order.downloads.map((d) => (
+                            <div key={d.id} className={styles.linkRow}>
+                                <span className={styles.linkText}>{d.url}</span>
+                                <span className={`${styles.status} ${styles[d.status.toLowerCase()]}`}>
+                                    {d.status === "USED" ? "مصرف شده" : "آماده"}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <Link href="/admin/orders" className={styles.backLink}>بازگشت</Link>
         </div>
     );
 }

@@ -1,11 +1,12 @@
-﻿"use client";
+"use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Link from "next/link";
+import { X, Lock, CheckCircle } from "lucide-react";
 import Button from "./ui/Button";
 import styles from "./CheckoutModal.module.css";
-import { X, Lock, CheckCircle, Plus, Minus } from "lucide-react";
-import axios from "axios";
 import { useCart } from "@/context/CartContext";
 
 interface CheckoutModalProps {
@@ -38,16 +39,9 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false 
 
     useEffect(() => {
         if (isOpen) {
-            axios.get("/api/admin/fields").then((res) => {
-                setCustomFields(res.data);
-            });
-            axios.get("/api/admin/product").then((res) => {
-                if (res.data) {
-                    setProduct(res.data);
-                }
-            });
+            axios.get("/api/admin/fields").then((res) => setCustomFields(res.data));
+            axios.get("/api/admin/product").then((res) => res.data && setProduct(res.data));
 
-            // همگام‌سازی تعداد با سبد خرید
             const cartQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
             if (cartQuantity > 0) {
                 setQuantity(cartQuantity);
@@ -68,15 +62,31 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false 
     };
 
     const handlePayment = async () => {
+        const checkoutQuantity = isCartCheckout
+            ? items.reduce((sum, item) => sum + item.quantity, 0)
+            : quantity;
+
+        if (!formData.email.trim() || !formData.mobile.trim()) {
+            alert("ایمیل و شماره موبایل را وارد کنید.");
+            return;
+        }
+        const missingRequired = customFields.filter(
+            (f) => f.required && !String((formData.customData as any)[f.name] || "").trim()
+        );
+        if (missingRequired.length > 0) {
+            alert("لطفاً فیلدهای اجباری را کامل کنید.");
+            return;
+        }
+
         setLoading(true);
         try {
             const response = await axios.post("/api/payment/request", {
-                amount: product.price * quantity,
-                description: `خرید ${quantity} عدد ${product.name}`,
+                amount: product.price * checkoutQuantity,
+                description: `خرید ${checkoutQuantity} عدد ${product.name}`,
                 email: formData.email,
                 mobile: formData.mobile,
                 customData: formData.customData,
-                quantity: quantity,
+                quantity: checkoutQuantity,
             });
 
             if (response.data.url) {
@@ -84,7 +94,7 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false 
             }
         } catch (error) {
             console.error("Payment failed", error);
-            alert("پرداخت با خطا مواجه شد، لطفاً دوباره تلاش کنید.");
+            alert("پرداخت انجام نشد، لطفاً دوباره تلاش کنید یا اطلاعات را بررسی کنید.");
         } finally {
             setLoading(false);
         }
@@ -133,23 +143,16 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false 
                                     <h3>{product.name}</h3>
                                     <span className={styles.priceBadge}>{(product.price * quantity).toLocaleString("fa-IR")} تومان</span>
                                 </div>
-                                <p className={styles.subtext}>تحویل دیجیتال فوری و پشتیبانی ۲۴/۷</p>
+                                <p className={styles.subtext}>تحویل دیجیتال فوری ۲۴/۷ و پشتیبانی</p>
 
-                                <div className={styles.quantityControl}>
-                                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className={styles.qtyBtn}>
-                                        <Minus size={16} />
-                                    </button>
+                                <div className={styles.quantityControl} data-readonly={isCartCheckout}>
                                     <span className={styles.qtyValue}>{quantity} عدد</span>
-                                    <button onClick={() => setQuantity(quantity + 1)} className={styles.qtyBtn}>
-                                        <Plus size={16} />
-                                    </button>
                                 </div>
                             </div>
 
                             <div className={styles.formSection}>
                                 <div className={styles.formHeader}>
                                     <h2>اطلاعات خریدار</h2>
-                                    <span className={styles.badge}>ایمن SSL</span>
                                 </div>
 
                                 <div className={styles.inputGrid}>
@@ -235,7 +238,7 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false 
                                 </div>
 
                                 <p className={styles.secureNote}>
-                                    <Lock size={12} /> پرداخت شما روی بستر امن و رمزنگاری‌شده انجام می‌شود.
+                                    <Link href="/terms">با پرداخت، قوانین سایت</Link> را می‌پذیرید.
                                 </p>
                             </div>
                         </div>

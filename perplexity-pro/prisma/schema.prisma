@@ -41,6 +41,7 @@ model Order {
   customData    String?  // JSON string of custom field answers
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  downloads     DownloadLink[]
 }
 
 model CustomField {
@@ -53,4 +54,20 @@ model CustomField {
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model DownloadLink {
+  id         String         @id @default(cuid())
+  url        String
+  status     DownloadStatus @default(AVAILABLE)
+  orderId    String?
+  order      Order?         @relation(fields: [orderId], references: [id])
+  consumedAt DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+enum DownloadStatus {
+  AVAILABLE
+  USED
 }

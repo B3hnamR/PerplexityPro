@@ -52,13 +52,13 @@ export default function FAQSection() {
                                 key={item.question}
                                 className={`${styles.item} ${isOpen ? styles.open : ""}`}
                                 layout
-                                transition={{ type: "spring", stiffness: 180, damping: 20, mass: 0.9 }}
+                                transition={{ duration: 0.28, ease: [0.33, 1, 0.68, 1] }}
                             >
                                 <button className={styles.question} onClick={() => toggle(idx)}>
                                     <span>{item.question}</span>
                                     <motion.span
                                         animate={{ rotate: isOpen ? 180 : 0 }}
-                                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                                        transition={{ duration: 0.25, ease: "easeInOut" }}
                                         className={styles.icon}
                                     >
                                         <ChevronDown size={18} />
@@ -68,11 +68,10 @@ export default function FAQSection() {
                                     {isOpen && (
                                         <motion.div
                                             className={styles.answer}
-                                            initial={{ height: 0, opacity: 0, y: -10 }}
-                                            animate={{ height: "auto", opacity: 1, y: 0 }}
-                                            exit={{ height: 0, opacity: 0, y: -10 }}
-                                            transition={{ type: "spring", stiffness: 180, damping: 20, mass: 0.9 }}
-                                            layout
+                                            initial={{ opacity: 0, y: -6 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -6 }}
+                                            transition={{ duration: 0.22, ease: [0.33, 1, 0.68, 1] }}
                                         >
                                             <p>{item.answer}</p>
                                         </motion.div>

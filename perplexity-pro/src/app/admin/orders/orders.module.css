@@ -1,7 +1,21 @@
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
 .title {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 2rem;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .tableContainer {
@@ -63,5 +77,62 @@
 }
 
 .action:hover {
+    text-decoration: underline;
+}
+
+.detailCard {
+    background: var(--surface);
+    border: 1px solid var(--surface-highlight);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.detailGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.detailBlock {
+    margin-top: 1rem;
+}
+
+.pre {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 0.75rem;
+    direction: ltr;
+    overflow: auto;
+    color: var(--foreground);
+}
+
+.linksList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.linkRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+}
+
+.linkText {
+    word-break: break-all;
+}
+
+.backLink {
+    color: var(--accent-light);
+}
+
+.backLink:hover {
     text-decoration: underline;
 }

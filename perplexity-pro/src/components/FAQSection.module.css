@@ -93,12 +93,13 @@
 }
 
 .answer {
-    padding: 1.4rem 1.6rem 1.4rem;
+    padding: 1.6rem 1.8rem 1.4rem;
     color: var(--foreground-muted);
     line-height: 1.7;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     background: rgba(23, 30, 47, 0.85);
     font-family: var(--font-sans), sans-serif;
+    overflow: hidden;
 }
 
 @media (max-width: 640px) {

@@ -8,6 +8,8 @@
     backdrop-filter: blur(12px);
     background: rgba(15, 23, 42, 0.6);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .container {
@@ -23,6 +25,9 @@
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    caret-color: transparent;
 }
 
 .logoIcon {
@@ -38,6 +43,8 @@
     padding: 0.3rem;
     border-radius: 100px;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .link {
@@ -47,6 +54,9 @@
     padding: 0.5rem 1.2rem;
     border-radius: 100px;
     transition: all 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    caret-color: transparent;
 }
 
 .link:hover {
@@ -71,6 +81,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+    caret-color: transparent;
 }
 
 .cartButton:hover {

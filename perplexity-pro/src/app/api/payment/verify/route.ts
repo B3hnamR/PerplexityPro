@@ -28,6 +28,21 @@ export async function GET(req: Request) {
             // Generate secure download token
             const downloadToken = crypto.randomBytes(32).toString("hex");
 
+            // Fetch available links equal to quantity
+            const links = await prisma.downloadLink.findMany({
+                where: { status: "AVAILABLE" },
+                take: order.quantity,
+            });
+
+            // Assign links if available
+            if (links.length > 0) {
+                const linkIds = links.map((l) => l.id);
+                await prisma.downloadLink.updateMany({
+                    where: { id: { in: linkIds } },
+                    data: { status: "USED", orderId: order.id, consumedAt: new Date() },
+                });
+            }
+
             // Update order
             const updated = await prisma.order.update({
                 where: { id: order.id },
@@ -38,11 +53,12 @@ export async function GET(req: Request) {
                 },
             });
 
-            const successUrl = new URL("/payment/success", req.url);
-            successUrl.searchParams.set("ref", String(response.data.ref_id));
-            if (updated.trackingCode) successUrl.searchParams.set("tracking", updated.trackingCode);
-
-            return NextResponse.redirect(successUrl);
+            // Redirect به صفحه تحویل
+            const deliveryUrl = new URL(`/delivery/${downloadToken}`, req.url);
+            if (links.length < order.quantity) {
+                deliveryUrl.searchParams.set("nostock", "1");
+            }
+            return NextResponse.redirect(deliveryUrl);
         } else {
             return NextResponse.redirect(new URL("/payment/failed", req.url));
         }

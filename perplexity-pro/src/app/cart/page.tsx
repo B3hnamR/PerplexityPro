@@ -29,14 +29,12 @@ export default function CartPage() {
                     <div>
                         <p className={styles.kicker}>پلن حرفه‌ای</p>
                         <h1>سبد خرید شما</h1>
-                        <p className={styles.lead}>
-                            سفارش را یک نگاه مرور کنید و در چند گام کوتاه پرداخت را کامل کنید؛ همه چیز در تم Perplexity Pro با پرداخت امن و تحویل فوری.
-                        </p>
+                        <p className={styles.lead}>سبد را یک نگاه مرور کنید و در چند گام کوتاه پرداخت را نهایی کنید؛ همه چیز در تم Perplexity Pro با پرداخت امن و تحویل فوری.</p>
                     </div>
                     <div className={styles.reassurance}>
-                        <span>پشتیبانی ۲۴/۷</span>
+                        <span>پرداخت امن و رمزگذاری‌شده</span>
                         <span className={styles.dot} />
-                        <span>تحویل فوری دیجیتال</span>
+                        <span>پشتیبانی ۲۴/۷ و تحویل سریع</span>
                     </div>
                 </div>
 
@@ -150,3 +148,4 @@ export default function CartPage() {
         </main>
     );
 }
+

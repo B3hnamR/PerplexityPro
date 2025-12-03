@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import StorySection from "@/components/StorySection";
 import TrustSection from "@/components/TrustSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import PricingSection from "@/components/PricingSection";
@@ -36,6 +37,7 @@ export default function HomeClient({ product }: HomeClientProps) {
             <StorySection />
             <TrustSection />
             <PricingSection product={product} />
+            <FAQSection />
             <TestimonialsSection />
             <Footer />
             <ScrollToTop />

@@ -109,30 +109,11 @@
     justify-content: center;
     gap: 0.6rem;
     background: rgba(255, 255, 255, 0.06);
-    padding: 0.35rem;
+    padding: 0.5rem 0.85rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 100px;
+    border-radius: 12px;
     width: fit-content;
     margin: 0 auto;
-}
-
-.qtyBtn {
-    background: rgba(255, 255, 255, 0.08);
-    border: none;
-    color: #e2e8f0;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.qtyBtn:hover {
-    background: rgba(34, 211, 238, 0.16);
-    color: #0f172a;
 }
 
 .qtyValue {
@@ -141,6 +122,11 @@
     text-align: center;
     font-size: 0.95rem;
     color: #e2e8f0;
+}
+
+.quantityControl[data-readonly="true"] {
+    cursor: default;
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .formHeader {
@@ -155,16 +141,6 @@
     margin: 0;
     color: #e2e8f0;
     font-weight: 800;
-}
-
-.badge {
-    background: rgba(34, 211, 238, 0.12);
-    border: 1px solid rgba(34, 211, 238, 0.3);
-    color: #7deffb;
-    padding: 0.35rem 0.65rem;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 700;
 }
 
 .inputGrid {
@@ -199,6 +175,9 @@
     outline: none;
     transition: all 0.2s;
     font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 .inputGroup input:focus,
@@ -206,6 +185,17 @@
 .inputGroup textarea:focus {
     border-color: rgba(34, 211, 238, 0.6);
     box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.12);
+}
+
+.inputGroup select option {
+    background: #0c1526;
+    color: #e2e8f0;
+}
+
+.inputGroup textarea {
+    resize: vertical;
+    min-height: 140px;
+    max-height: 240px;
 }
 
 .actionButtons {
@@ -271,4 +261,9 @@
     margin-top: 1rem;
     font-size: 0.82rem;
     color: rgba(255, 255, 255, 0.65);
+}
+
+.secureNote a {
+    color: #7deffb;
+    text-decoration: underline;
 }
