@@ -57,17 +57,12 @@ model CustomField {
 }
 
 model DownloadLink {
-  id         String         @id @default(cuid())
+  id         String   @id @default(cuid())
   url        String
-  status     DownloadStatus @default(AVAILABLE)
+  status     String   @default("AVAILABLE")
   orderId    String?
-  order      Order?         @relation(fields: [orderId], references: [id])
+  order      Order?   @relation(fields: [orderId], references: [id])
   consumedAt DateTime?
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
-}
-
-enum DownloadStatus {
-  AVAILABLE
-  USED
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

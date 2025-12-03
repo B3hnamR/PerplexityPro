@@ -3,9 +3,9 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 
 export async function GET() {
-    const available = await prisma.downloadLink.count({ where: { status: "AVAILABLE" } });
-    const used = await prisma.downloadLink.count({ where: { status: "USED" } });
-    const latest = await prisma.downloadLink.findMany({
+    const available = await (prisma as any).downloadLink.count({ where: { status: "AVAILABLE" } });
+    const used = await (prisma as any).downloadLink.count({ where: { status: "USED" } });
+    const latest = await (prisma as any).downloadLink.findMany({
         orderBy: { createdAt: "desc" },
         take: 20,
         select: { id: true, url: true, status: true, createdAt: true },
@@ -32,8 +32,13 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "No valid links" }, { status: 400 });
     }
 
-    const created = await prisma.downloadLink.createMany({ data, skipDuplicates: true });
-    return NextResponse.json({ added: created.count });
+    try {
+        const created = await (prisma as any).downloadLink.createMany({ data, skipDuplicates: true });
+        return NextResponse.json({ added: created.count });
+    } catch (e: any) {
+        console.error("add links error", e);
+        return NextResponse.json({ error: "Failed to save links" }, { status: 500 });
+    }
 }
 
 export async function DELETE(req: Request) {
@@ -44,6 +49,6 @@ export async function DELETE(req: Request) {
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
 
-    await prisma.downloadLink.delete({ where: { id } });
+    await (prisma as any).downloadLink.delete({ where: { id } });
     return NextResponse.json({ success: true });
 }

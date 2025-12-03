@@ -129,6 +129,10 @@
     word-break: break-all;
 }
 
+.muted {
+    color: var(--foreground-muted);
+}
+
 .backLink {
     color: var(--accent-light);
 }

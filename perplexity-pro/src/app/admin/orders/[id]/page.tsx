@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+﻿import { prisma } from "@/lib/db";
 import styles from "../orders.module.css";
 import Link from "next/link";
 
@@ -11,11 +11,11 @@ export const dynamic = "force-dynamic";
 export default async function OrderDetailPage({ params }: Props) {
     const order = await prisma.order.findUnique({
         where: { id: params.id },
-        include: { downloads: true } as any,
+        include: { downloads: true },
     });
 
     if (!order) {
-        return <div className={styles.container}><p>سفارش یافت نشد.</p></div>;
+        return <div className={styles.container}><p>سفارش پیدا نشد.</p></div>;
     }
 
     return (
@@ -23,17 +23,17 @@ export default async function OrderDetailPage({ params }: Props) {
             <h1 className={styles.title}>جزئیات سفارش</h1>
             <div className={styles.detailCard}>
                 <div className={styles.detailGrid}>
-                    <div><strong>شناسه:</strong> {order.id}</div>
+                    <div><strong>شماره سفارش:</strong> {order.id}</div>
                     <div><strong>کد پیگیری:</strong> {order.trackingCode || "-"}</div>
-                    <div><strong>ایمیل:</strong> {order.customerEmail}</div>
-                    <div><strong>مبلغ:</strong> {order.amount.toLocaleString("fa-IR")} تومان</div>
+                    <div><strong>ایمیل خریدار:</strong> {order.customerEmail}</div>
+                    <div><strong>مبلغ:</strong> {order.amount.toLocaleString("fa-IR") } تومان</div>
                     <div><strong>تعداد:</strong> {order.quantity}</div>
                     <div><strong>وضعیت:</strong> {order.status}</div>
                     <div><strong>تاریخ:</strong> {new Date(order.createdAt).toLocaleString("fa-IR")}</div>
                 </div>
                 {order.customData && (
                     <div className={styles.detailBlock}>
-                        <strong>اطلاعات سفارشی:</strong>
+                        <strong>اطلاعات تکمیلی خریدار:</strong>
                         <pre className={styles.pre}>{order.customData}</pre>
                     </div>
                 )}
@@ -49,7 +49,7 @@ export default async function OrderDetailPage({ params }: Props) {
                             <div key={d.id} className={styles.linkRow}>
                                 <span className={styles.linkText}>{d.url}</span>
                                 <span className={`${styles.status} ${styles[d.status.toLowerCase()]}`}>
-                                    {d.status === "USED" ? "مصرف شده" : "آماده"}
+                                    {d.status === "USED" ? "مصرف‌شده" : "آماده"}
                                 </span>
                             </div>
                         ))}

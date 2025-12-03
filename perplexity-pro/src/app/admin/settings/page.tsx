@@ -24,12 +24,9 @@ export default function SettingsPage() {
         options: '',
     });
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [linksInput, setLinksInput] = useState('');
-    const [linkStats, setLinkStats] = useState<{ available: number; used: number; latest: any[] }>({ available: 0, used: 0, latest: [] });
 
     useEffect(() => {
         fetchFields();
-        fetchLinks();
     }, []);
 
     const fetchFields = async () => {
@@ -82,20 +79,6 @@ export default function SettingsPage() {
     const cancelEdit = () => {
         setEditingId(null);
         setNewField({ label: '', name: '', type: 'text', required: false, options: '' });
-    };
-
-    const fetchLinks = async () => {
-        const res = await axios.get('/api/admin/links');
-        setLinkStats(res.data);
-    };
-
-    const handleAddLinks = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const lines = linksInput.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
-        if (lines.length === 0) return;
-        await axios.post('/api/admin/links', { links: lines });
-        setLinksInput('');
-        fetchLinks();
     };
 
     return (
@@ -186,26 +169,6 @@ export default function SettingsPage() {
                 ))}
             </div>
 
-            <div className={styles.card}>
-                <h2>انبار لینک‌های تحویل</h2>
-                <p className={styles.muted}>لینک‌های فعال‌سازی را هر خط جداگانه وارد کنید.</p>
-                <form onSubmit={handleAddLinks} className={styles.form}>
-                    <textarea
-                        className={styles.input}
-                        rows={4}
-                        placeholder="https://example.com/?uuid=...."
-                        value={linksInput}
-                        onChange={(e) => setLinksInput(e.target.value)}
-                    />
-                    <button type="submit" className={styles.addButton}>
-                        <Plus size={18} /> افزودن لینک‌ها
-                    </button>
-                </form>
-                <div className={styles.linkStats}>
-                    <span>موجودی آماده: {linkStats.available}</span>
-                    <span>مصرف شده: {linkStats.used}</span>
-                </div>
-            </div>
         </div>
     );
 }

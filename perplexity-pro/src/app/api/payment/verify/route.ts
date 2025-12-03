@@ -29,15 +29,15 @@ export async function GET(req: Request) {
             const downloadToken = crypto.randomBytes(32).toString("hex");
 
             // Fetch available links equal to quantity
-            const links = await prisma.downloadLink.findMany({
+            const links = await (prisma as any).downloadLink.findMany({
                 where: { status: "AVAILABLE" },
                 take: order.quantity,
             });
 
             // Assign links if available
             if (links.length > 0) {
-                const linkIds = links.map((l) => l.id);
-                await prisma.downloadLink.updateMany({
+                const linkIds = links.map((l: any) => l.id);
+                await (prisma as any).downloadLink.updateMany({
                     where: { id: { in: linkIds } },
                     data: { status: "USED", orderId: order.id, consumedAt: new Date() },
                 });
