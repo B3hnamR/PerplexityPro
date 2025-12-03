@@ -21,9 +21,9 @@ export default async function DeliveryPage({ params, searchParams }: PageProps) 
         return (
             <div className={styles.page}>
                 <div className={styles.card}>
-                    <h1 className={styles.title}>سفارش یافت نشد</h1>
+                    <h1 className={styles.title}>{"سفارش یافت نشد"}</h1>
                     <p className={styles.subtitle}>
-                        لینک ارائه‌شده معتبر نیست یا سفارش مربوطه پیدا نشد. لطفا دوباره از حساب خود وضعیت سفارش را بررسی کنید.
+                        {"لینک ارائه‌شده معتبر نیست یا سفارش مربوطه پیدا نشد. لطفا دوباره از حساب خود وضعیت سفارش را بررسی کنید."}
                     </p>
                 </div>
             </div>

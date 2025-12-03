@@ -48,11 +48,11 @@ export default function LinksInventoryPage() {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>انبار لینک‌های تحویل</h1>
+            <h1 className={styles.title}>{"انبار لینک‌های تحویل"}</h1>
 
             <div className={styles.card}>
-                <h2>افزودن لینک‌های جدید</h2>
-                <p className={styles.muted}>هر خط یک لینک فعال‌سازی است. بعد از ثبت، لینک‌ها در سفارش‌های بعدی به‌صورت خودکار استفاده می‌شوند.</p>
+                <h2>{"افزودن لینک‌های جدید"}</h2>
+                <p className={styles.muted}>{"هر خط یک لینک فعال‌سازی است. بعد از ثبت، لینک‌ها در سفارش‌های بعدی به‌صورت خودکار استفاده می‌شوند."}</p>
                 <form onSubmit={handleAddLinks} className={styles.form}>
                     <textarea
                         className={styles.input}
@@ -67,15 +67,15 @@ export default function LinksInventoryPage() {
                 </form>
                 {error && <p className={styles.errorText}>{error}</p>}
                 <div className={styles.linkStats}>
-                    <span>لینک‌های آماده: {stats.available}</span>
-                    <span>لینک‌های مصرف‌شده: {stats.used}</span>
+                    <span>{"لینک‌های آماده: "} {stats.available}</span>
+                    <span>{"لینک‌های مصرف‌شده: "} {stats.used}</span>
                 </div>
             </div>
 
             <div className={styles.card}>
-                <h2>آخرین لینک‌های ثبت‌شده</h2>
+                <h2>{"آخرین لینک‌های ثبت‌شده"}</h2>
                 {stats.latest.length === 0 ? (
-                    <p className={styles.muted}>لینکی ثبت نشده است.</p>
+                    <p className={styles.muted}>{"لینکی ثبت نشده است."}</p>
                 ) : (
                     <div className={styles.linksList}>
                         {stats.latest.map((l) => (
