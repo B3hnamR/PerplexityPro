@@ -17,7 +17,7 @@ const UsageProgressCard = () => {
     const strokeDashoffset = circumference - (progress / 100) * circumference;
 
     return (
-        <div className="relative max-w-4xl mx-auto mb-24">
+        <div className="relative max-w-4xl mx-auto mb-24 animate-fade-in">
             <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-[2.5rem] blur-xl opacity-30"></div>
             <div className="relative bg-[#0f172a] border border-white/10 rounded-[2rem] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl overflow-hidden">
                 

@@ -1,75 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --background: #0f172a; /* Slate 900 */
-  --surface: #1e293b;    /* Slate 800 */
-  --surface-highlight: rgba(255, 255, 255, 0.1);
-  --foreground: #f8fafc;
-  --foreground-muted: #94a3b8;
-
-  --primary: #06b6d4;    /* Cyan 500 */
-  --primary-hover: #0891b2;
-  --secondary: #2563eb;  /* Blue 600 */
-  
-  --font-sans: var(--font-vazir), system-ui, sans-serif;
-  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-html {
-  scroll-behavior: smooth;
+  --font-vazir: "Vazirmatn", system-ui, sans-serif;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-sans);
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+  @apply bg-[#0f172a] text-white font-sans antialiased overflow-x-hidden;
 }
 
-/* Custom Scrollbar */
+/* اسکرول بار سفارشی */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  @apply bg-[#0f172a];
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  @apply bg-[#334155] rounded-full;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
-}
-
-/* Global Animations */
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
-}
-
-@keyframes float-reverse {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(20px); }
-  100% { transform: translateY(0px); }
-}
-
-@keyframes ping {
-  75%, 100% { transform: scale(2); opacity: 0; }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  @apply bg-cyan-500;
 }

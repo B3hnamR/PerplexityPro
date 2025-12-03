@@ -1,9 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import styles from "./FAQSection.module.css";
 
 const faqs = [
     {
@@ -32,24 +30,31 @@ export default function FAQSection() {
     };
 
     return (
-        <section className={styles.section} id="faq">
-            <div className={styles.container}>
-                <div className={styles.header}>
-                    <div className={styles.badge}>سوالات متداول</div>
-                    <h2 className={styles.title}>قبل از خرید، همه چیز را روشن کنید</h2>
+        <section id="faq" className="py-24 bg-[#0b1120]">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-16">
+                    <div className="inline-block px-4 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-sm mb-4">
+                        سوالات متداول
+                    </div>
+                    <h2 className="text-3xl font-black text-white">قبل از خرید، همه چیز را روشن کنید</h2>
                 </div>
-
-                <div className={styles.list}>
-                    {faqs.map((item, idx) => {
-                        const isOpen = openIndex === idx;
+                
+                <div className="space-y-4">
+                    {faqs.map((faq, index) => {
+                        const isOpen = openIndex === index;
                         return (
-                            <div key={idx} className={`${styles.item} ${isOpen ? styles.active : ""}`}>
-                                <button className={styles.questionBtn} onClick={() => toggle(idx)}>
-                                    <span className={styles.questionText}>{item.question}</span>
-                                    {isOpen ? <ChevronUp className={styles.icon} /> : <ChevronDown className={styles.icon} />}
+                            <div key={index} className="border border-white/10 rounded-2xl bg-[#1e293b]/30 overflow-hidden transition-all duration-300 hover:border-cyan-500/30">
+                                <button 
+                                    onClick={() => toggle(index)}
+                                    className="flex items-center justify-between w-full p-6 text-right focus:outline-none"
+                                >
+                                    <span className="font-bold text-white text-lg">{faq.question}</span>
+                                    {isOpen ? <ChevronUp className="text-cyan-400" /> : <ChevronDown className="text-gray-400" />}
                                 </button>
-                                <div className={`${styles.answerWrapper} ${isOpen ? styles.show : ''}`}>
-                                    <p className={styles.answerText}>{item.answer}</p>
+                                <div 
+                                    className={`px-6 text-gray-400 text-sm leading-relaxed overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-40 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
+                                >
+                                    {faq.answer}
                                 </div>
                             </div>
                         );
