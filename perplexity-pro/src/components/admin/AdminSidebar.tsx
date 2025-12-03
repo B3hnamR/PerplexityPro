@@ -44,7 +44,7 @@ export default function AdminSidebar() {
             <div className={styles.footer}>
                 <button className={styles.logoutButton} onClick={() => signOut()}>
                     <LogOut size={20} />
-                    <span>\u062e\u0631\u0648\u062c</span>
+                    <span>خروج</span>
                 </button>
             </div>
         </aside>

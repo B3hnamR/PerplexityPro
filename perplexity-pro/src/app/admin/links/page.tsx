@@ -58,6 +58,8 @@ export default function LinksInventoryPage() {
                         className={styles.input}
                         rows={4}
                         placeholder="https://example.com/?uuid=...."
+                        id="links-input"
+                        name="links-input"
                         value={linksInput}
                         onChange={(e) => setLinksInput(e.target.value)}
                     />

@@ -1,21 +1,26 @@
-﻿import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/db";
 import styles from "../orders.module.css";
 import Link from "next/link";
 
-interface Props {
-    params: { id: string };
-}
-
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-export default async function OrderDetailPage({ params }: Props) {
+type ParamsInput = { id: string } | Promise<{ id: string }>;
+
+export default async function OrderDetailPage({ params }: { params: ParamsInput }) {
+    const resolvedParams = await params;
+
     const order = await prisma.order.findUnique({
-        where: { id: params.id },
+        where: { id: resolvedParams.id },
         include: { downloads: true },
     });
 
     if (!order) {
-        return <div className={styles.container}><p>سفارش پیدا نشد.</p></div>;
+        return (
+            <div className={styles.container}>
+                <p>سفارش پیدا نشد.</p>
+            </div>
+        );
     }
 
     return (
@@ -26,7 +31,7 @@ export default async function OrderDetailPage({ params }: Props) {
                     <div><strong>شماره سفارش:</strong> {order.id}</div>
                     <div><strong>کد پیگیری:</strong> {order.trackingCode || "-"}</div>
                     <div><strong>ایمیل خریدار:</strong> {order.customerEmail}</div>
-                    <div><strong>مبلغ:</strong> {order.amount.toLocaleString("fa-IR") } تومان</div>
+                    <div><strong>مبلغ:</strong> {order.amount.toLocaleString("fa-IR")} تومان</div>
                     <div><strong>تعداد:</strong> {order.quantity}</div>
                     <div><strong>وضعیت:</strong> {order.status}</div>
                     <div><strong>تاریخ:</strong> {new Date(order.createdAt).toLocaleString("fa-IR")}</div>

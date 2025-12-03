@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function GET() {
     const available = await (prisma as any).downloadLink.count({ where: { status: "AVAILABLE" } });
     const used = await (prisma as any).downloadLink.count({ where: { status: "USED" } });
@@ -17,8 +20,14 @@ export async function POST(req: Request) {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const body = await req.json();
-    const links: string[] = body.links;
+    let body: any;
+    try {
+        body = await req.json();
+    } catch (e) {
+        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+
+    const links: string[] = body?.links;
     if (!Array.isArray(links) || links.length === 0) {
         return NextResponse.json({ error: "links array required" }, { status: 400 });
     }
@@ -26,18 +35,22 @@ export async function POST(req: Request) {
     const data = links
         .map((url: string) => url.trim())
         .filter((u: string) => u.length > 0)
-        .map((url: string) => ({ url }));
+        .map((url: string) => ({ url, status: "AVAILABLE" }));
 
     if (data.length === 0) {
         return NextResponse.json({ error: "No valid links" }, { status: 400 });
     }
 
     try {
-        const created = await (prisma as any).downloadLink.createMany({ data, skipDuplicates: true });
-        return NextResponse.json({ added: created.count });
+        // Some adapters (e.g. SQLite with certain drivers) may not support createMany reliably under turbopack.
+        // Fallback to per-item creates inside a transaction.
+        const created = await prisma.$transaction(
+            data.map((item: any) => (prisma as any).downloadLink.create({ data: item }))
+        );
+        return NextResponse.json({ added: created.length });
     } catch (e: any) {
         console.error("add links error", e);
-        return NextResponse.json({ error: "Failed to save links" }, { status: 500 });
+        return NextResponse.json({ error: e?.message || "Failed to save links" }, { status: 500 });
     }
 }
 
