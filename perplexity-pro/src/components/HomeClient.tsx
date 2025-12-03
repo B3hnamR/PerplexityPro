@@ -2,15 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
-import StorySection from "@/components/StorySection"; // این فایل باید محتوای Features جدید را داشته باشد
+import Hero from "@/components/Hero";
 import SmartSearchDemo from "@/components/SmartSearchDemo";
-import TestimonialsSection from "@/components/TestimonialsSection";
+import StorySection from "@/components/StorySection"; // همان بخش Features جدید
+import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
-import PricingSection from "@/components/PricingSection";
 
 interface HomeClientProps {
     product: any;
@@ -30,11 +30,10 @@ export default function HomeClient({ product }: HomeClientProps) {
     };
 
     return (
-        <main className="bg-[#0f172a] min-h-screen">
+        <main className="bg-[#0f172a] min-h-screen text-white overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
             <Navbar onPreOrder={handlePreOrder} />
             <Hero onPreOrder={handlePreOrder} />
             <SmartSearchDemo />
-            {/* StorySection در طراحی جدید همان Features است */}
             <StorySection />
             <PricingSection product={product} />
             <FAQSection />
