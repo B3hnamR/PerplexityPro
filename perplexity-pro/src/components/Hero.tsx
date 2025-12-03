@@ -24,11 +24,11 @@ export default function Hero({ onPreOrder }: HeroProps) {
                     نسخه حرفه‌ای در دسترس است
                 </div>
                 
-                {/* LOGO IMAGE */}
+                {/* LOGO IMAGE - Fixed Filename */}
                 <div className="flex justify-center items-center mb-12 relative animate-fade-in">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32 bg-cyan-500/20 blur-[50px] rounded-full"></div>
                     <img 
-                        src="/PerplexityPro-Logo.png" 
+                        src="/perplexity-pro-logo.png" 
                         alt="Perplexity Pro" 
                         className="relative z-10 w-full max-w-[600px] h-auto object-contain drop-shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.5)] transition-all duration-500"
                         onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -50,7 +50,7 @@ export default function Hero({ onPreOrder }: HeroProps) {
                     </a>
                 </div>
 
-                {/* Floating Icons Visualization */}
+                {/* Floating Icons */}
                 <div className="mt-24 relative max-w-5xl mx-auto h-24 md:h-32 hidden sm:block">
                    <div className="absolute left-0 top-2 animate-float-slow opacity-80 bg-[#1e293b]/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 text-xs md:text-sm text-gray-300 shadow-lg hover:border-cyan-500/30 transition-colors">Claude Sonnet 4.5</div>
                    <div className="absolute left-[18%] bottom-0 animate-float-delayed opacity-80 bg-[#1e293b]/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 text-xs md:text-sm text-gray-300 shadow-lg hover:border-cyan-500/30 transition-colors">GPT-5.1</div>

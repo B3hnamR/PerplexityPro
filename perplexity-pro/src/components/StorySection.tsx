@@ -5,6 +5,58 @@ import {
     Image as ImageIcon, Zap, UserCheck, Brain, ArrowRight 
 } from "lucide-react";
 
+// تعریف دقیق کلاس‌ها برای شناسایی توسط Tailwind
+const colorVariants: Record<string, { text: string; hoverText: string; hoverBorder: string; glow: string }> = {
+    cyan: {
+        text: "text-cyan-400",
+        hoverText: "group-hover:text-cyan-300",
+        hoverBorder: "group-hover:border-cyan-500/20",
+        glow: "rgba(6,182,212,0.2)"
+    },
+    emerald: {
+        text: "text-emerald-400",
+        hoverText: "group-hover:text-emerald-300",
+        hoverBorder: "group-hover:border-emerald-500/20",
+        glow: "rgba(16,185,129,0.2)"
+    },
+    indigo: {
+        text: "text-indigo-400",
+        hoverText: "group-hover:text-indigo-300",
+        hoverBorder: "group-hover:border-indigo-500/20",
+        glow: "rgba(99,102,241,0.2)"
+    },
+    blue: {
+        text: "text-blue-400",
+        hoverText: "group-hover:text-blue-300",
+        hoverBorder: "group-hover:border-blue-500/20",
+        glow: "rgba(59,130,246,0.2)"
+    },
+    pink: {
+        text: "text-pink-400",
+        hoverText: "group-hover:text-pink-300",
+        hoverBorder: "group-hover:border-pink-500/20",
+        glow: "rgba(236,72,153,0.2)"
+    },
+    amber: {
+        text: "text-amber-400",
+        hoverText: "group-hover:text-amber-300",
+        hoverBorder: "group-hover:border-amber-500/20",
+        glow: "rgba(245,158,11,0.2)"
+    },
+    purple: {
+        text: "text-purple-400",
+        hoverText: "group-hover:text-purple-300",
+        hoverBorder: "group-hover:border-purple-500/20",
+        glow: "rgba(168,85,247,0.2)"
+    },
+    rose: {
+        text: "text-rose-400",
+        hoverText: "group-hover:text-rose-300",
+        hoverBorder: "group-hover:border-rose-500/20",
+        glow: "rgba(244,63,94,0.2)"
+    }
+};
+
 interface FeatureCardProps {
     icon: React.ElementType;
     title: string;
@@ -15,35 +67,21 @@ interface FeatureCardProps {
 }
 
 const FeatureCard = ({ icon: Icon, title, description, tags, className = "", gradientColor }: FeatureCardProps) => {
-    // Mapping gradient color names to actual Tailwind classes is tricky dynamically,
-    // so we use inline styles for the glow color specifically or safelist classes.
-    // Here we will use a mapping for simplicity.
-    const colorMap: Record<string, string> = {
-        cyan: "rgba(6,182,212",
-        emerald: "rgba(16,185,129",
-        indigo: "rgba(99,102,241",
-        blue: "rgba(59,130,246",
-        pink: "rgba(236,72,153",
-        amber: "rgba(245,158,11",
-        purple: "rgba(168,85,247",
-        rose: "rgba(244,63,94",
-    };
-    
-    const baseColor = colorMap[gradientColor] || "rgba(255,255,255";
+    const colors = colorVariants[gradientColor] || colorVariants.cyan;
 
     return (
         <div className={`group relative p-8 rounded-[2rem] bg-[#1e293b]/40 border border-white/5 hover:border-white/10 transition-all duration-500 overflow-hidden ${className}`}>
             
             {/* Dynamic Background Gradient Blob */}
             <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[80px] transition-all duration-500 opacity-0 group-hover:opacity-100"
-                 style={{ backgroundColor: `${baseColor}, 0.2)` }}>
+                 style={{ backgroundColor: colors.glow }}>
             </div>
             
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col">
                 <div className="flex justify-between items-start mb-6">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] border border-white/5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
-                        <Icon className="text-gray-400 group-hover:text-white transition-colors" size={28} />
+                        <Icon className={`text-gray-400 group-hover:text-white transition-colors`} size={28} />
                     </div>
                     
                     <div className="opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-500 text-gray-500">
@@ -61,7 +99,7 @@ const FeatureCard = ({ icon: Icon, title, description, tags, className = "", gra
                 
                 <div className="flex flex-wrap gap-2 mt-auto">
                     {tags.map((tag, idx) => (
-                        <span key={idx} className="px-3 py-1 rounded-lg text-xs font-medium border border-white/5 bg-white/5 text-gray-400 group-hover:border-white/10 group-hover:text-white transition-all">
+                        <span key={idx} className={`px-3 py-1 rounded-lg text-xs font-medium border border-white/5 bg-white/5 text-gray-400 ${colors.hoverBorder} ${colors.hoverText} transition-all`}>
                             {tag}
                         </span>
                     ))}
