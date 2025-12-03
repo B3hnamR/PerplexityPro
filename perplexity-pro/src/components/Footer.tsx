@@ -2,12 +2,7 @@
 
 import styles from "./Footer.module.css";
 import Link from "next/link";
-import { Instagram, Send, ShieldCheck } from "lucide-react";
-
-const socialLinks = [
-    { href: "https://t.me/", label: "تلگرام", icon: Send },
-    { href: "https://instagram.com/", label: "اینستاگرام", icon: Instagram },
-];
+import { Instagram, Send, ShieldCheck, Brain } from "lucide-react";
 
 export default function Footer() {
     return (
@@ -16,21 +11,17 @@ export default function Footer() {
                 <div className={styles.topSection}>
                     <div className={styles.brandColumn}>
                         <div className={styles.logoWrapper}>
-                            <img src="/perplexity-icon.svg" alt="Perplexity" className={styles.logoIcon} />
+                            <div style={{ background: 'var(--primary)', borderRadius: '8px', padding: '4px', display: 'flex' }}>
+                                <Brain size={24} color="#0f172a" />
+                            </div>
                             <span className={styles.brandName}>Perplexity Pro</span>
                         </div>
                         <p className={styles.brandDescription}>
                             دسترسی حرفه‌ای به مدل‌های پیشرفته جستجوی هوشمند. تجربه‌ای سریع، امن و یکپارچه برای کاربران جدی.
                         </p>
                         <div className={styles.socialLinks}>
-                            {socialLinks.map((item) => {
-                                const Icon = item.icon;
-                                return (
-                                    <a key={item.href} href={item.href} className={styles.socialLink} target="_blank" rel="noreferrer" aria-label={item.label}>
-                                        <Icon size={20} />
-                                    </a>
-                                );
-                            })}
+                            <a href="#" className={styles.socialLink}><Send size={20} /></a>
+                            <a href="#" className={styles.socialLink}><Instagram size={20} /></a>
                         </div>
                     </div>
 
@@ -39,7 +30,7 @@ export default function Footer() {
                         <Link href="#features" className={styles.link}>ویژگی‌ها</Link>
                         <Link href="#testimonials" className={styles.link}>نظرات کاربران</Link>
                         <Link href="#pricing" className={styles.link}>پلن‌ها و قیمت</Link>
-                        <Link href="#faq" className={styles.link}>سؤالات متداول</Link>
+                        <Link href="#faq" className={styles.link}>سوالات متداول</Link>
                     </div>
 
                     <div className={styles.linksColumn}>
@@ -54,12 +45,12 @@ export default function Footer() {
                         <h3 className={styles.columnTitle}>اعتماد و امنیت</h3>
                         <div className={styles.trustSymbols}>
                             <div className={styles.trustBadge}>
-                                <ShieldCheck size={32} color="#22d3ee" />
+                                <ShieldCheck size={24} color="#22d3ee" />
                                 <span>نماد اعتماد الکترونیک</span>
                             </div>
                             <div className={styles.trustBadge}>
-                                <ShieldCheck size={32} color="#fbbf24" />
-                                <span>نماد زرین‌پال</span>
+                                <ShieldCheck size={24} color="#fbbf24" />
+                                <span>تضمین پرداخت امن</span>
                             </div>
                         </div>
                     </div>
@@ -67,10 +58,10 @@ export default function Footer() {
 
                 <div className={styles.bottomSection}>
                     <p className={styles.copyright}>
-                        © {new Date().getFullYear()} تمامی حقوق برای Perplexity Pro محفوظ است.
+                        © ۲۰۲۵ تمامی حقوق برای Perplexity Pro محفوظ است.
                     </p>
                     <p className={styles.designedBy}>
-                        طراحی شده با ❤️ توسط <span className={styles.designerName}>بهنام رجب نژاد</span>
+                        طراحی شده با ❤️ توسط <strong style={{ color: 'white' }}>بهنام رجب نژاد</strong>
                     </p>
                 </div>
             </div>

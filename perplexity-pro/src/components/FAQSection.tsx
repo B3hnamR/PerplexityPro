@@ -8,23 +8,19 @@ import styles from "./FAQSection.module.css";
 const faqs = [
     {
         question: "اشتراک Perplexity Pro چه مزیتی دارد؟",
-        answer: "دسترسی به مدل‌های پیشرفته، پاسخ‌های سریع‌تر و اولویت در صف پردازش برای جستجوهای حجیم را دریافت می‌کنید.",
+        answer: "دسترسی به جدیدترین مدل‌های جهان مثل GPT-5.1، Claude Sonnet 4.5 و Gemini 3 Pro، سرعت پاسخگویی بالاتر، اولویت در صف پردازش و قابلیت آپلود فایل‌های حجیم برای آنالیز دقیق.",
     },
     {
         question: "تحویل و فعال‌سازی چطور انجام می‌شود؟",
-        answer: "پس از پرداخت آنلاین، دسترسی دیجیتال شما بلافاصله فعال می‌شود و ایمیل تأیید دریافت می‌کنید.",
+        answer: "بلافاصله پس از پرداخت، لایسنس اختصاصی به ایمیل شما ارسال می‌شود و می‌توانید روی اکانت شخصی خودتان آن را فعال کنید.",
     },
     {
-        question: "می‌توانم اشتراک را لغو یا تمدید کنم؟",
-        answer: "بله، هر زمان می‌توانید تمدید یا لغو کنید و دسترسی فعلی تا پایان دوره باقی می‌ماند.",
+        question: "آیا می‌توانم اشتراک را لغو یا تمدید کنم؟",
+        answer: "بله، در هر زمان می‌توانید اشتراک خود را مدیریت کنید. برای تمدید نیز می‌توانید از همین پنل اقدام کنید.",
     },
     {
         question: "پرداخت امن است؟",
-        answer: "پرداخت روی بستر امن و رمزنگاری‌شده انجام می‌شود و رسید پرداخت بلافاصله صادر می‌گردد.",
-    },
-    {
-        question: "در صورت مشکل از کجا پیگیری کنم؟",
-        answer: "پشتیبانی ۲۴/۷ از طریق ایمیل و پیام‌رسان در دسترس است و وضعیت خرید شما را بررسی می‌کند.",
+        answer: "بله، تمامی پرداخت‌ها از طریق درگاه‌های امن بانکی (زرین‌پال) انجام می‌شود و اطلاعات شما کاملاً محفوظ است.",
     },
 ];
 
@@ -41,7 +37,6 @@ export default function FAQSection() {
                 <div className={styles.header}>
                     <div className={styles.badge}><HelpCircle size={16} /> سوالات متداول</div>
                     <h2 className={styles.title}>قبل از خرید، همه‌چیز را روشن کنید</h2>
-                    <p className={styles.subtitle}>پرسش‌های پرتکرار را اینجا آورده‌ایم تا مسیر خرید سریع و شفاف باشد.</p>
                 </div>
 
                 <div className={styles.list}>
@@ -49,29 +44,20 @@ export default function FAQSection() {
                         const isOpen = openIndex === idx;
                         return (
                             <motion.div
-                                key={item.question}
+                                key={idx}
                                 className={`${styles.item} ${isOpen ? styles.open : ""}`}
-                                layout
-                                transition={{ duration: 0.28, ease: [0.33, 1, 0.68, 1] }}
                             >
                                 <button className={styles.question} onClick={() => toggle(idx)}>
                                     <span>{item.question}</span>
-                                    <motion.span
-                                        animate={{ rotate: isOpen ? 180 : 0 }}
-                                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                                        className={styles.icon}
-                                    >
-                                        <ChevronDown size={18} />
-                                    </motion.span>
+                                    <ChevronDown size={18} className={styles.icon} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
                                 </button>
                                 <AnimatePresence initial={false}>
                                     {isOpen && (
                                         <motion.div
                                             className={styles.answer}
-                                            initial={{ opacity: 0, y: -6 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -6 }}
-                                            transition={{ duration: 0.22, ease: [0.33, 1, 0.68, 1] }}
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: "auto", opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
                                         >
                                             <p>{item.answer}</p>
                                         </motion.div>

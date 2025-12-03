@@ -1,85 +1,197 @@
 .hero {
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center !important;
+    justify-content: center;
     position: relative;
     overflow: hidden;
-    padding-top: 80px;
+    padding-top: 120px;
+    padding-bottom: 4rem;
     user-select: none;
-    -webkit-user-select: none;
-    flex-direction: column;
 }
 
 .content {
     position: relative;
     z-index: 10;
     text-align: center;
-    max-width: 800px;
+    max-width: 900px;
     padding: 0 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center !important;
-    justify-content: center !important;
     width: 100%;
-}
-
-.textContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-.logoWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center !important;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    width: 100%;
-    direction: ltr;
-}
-
-.mainLogo {
-    width: 100px;
-    height: 100px;
-    filter: brightness(0) invert(1);
-}
-
-.textLogo {
-    height: 70px;
-    margin-top: 5px;
 }
 
 .badge {
-    background: rgba(34, 211, 238, 0.1);
-    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 0.5rem 1.5rem;
     border-radius: 100px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    border: 1px solid rgba(34, 211, 238, 0.2);
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.1);
-    width: fit-content;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--primary);
+    margin-bottom: 3rem;
+    backdrop-filter: blur(10px);
+}
+
+.badgeDot {
+    display: flex;
+    position: relative;
+    width: 12px;
+    height: 12px;
+}
+
+.badgeDotPing {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--primary);
+    opacity: 0.75;
+    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.badgeDotSolid {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #06b6d4;
+}
+
+.logoContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.logoGlow {
+    position: absolute;
+    width: 250px;
+    height: 120px;
+    background: rgba(34, 211, 238, 0.2);
+    filter: blur(60px);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.logoImage {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.3));
+    transition: transform 0.5s ease;
+}
+
+.logoImage:hover {
+    filter: drop-shadow(0 0 30px rgba(34, 211, 238, 0.5));
+    transform: scale(1.02);
+}
+
+.description {
+    font-size: 1.25rem;
+    color: var(--foreground-muted);
+    line-height: 1.8;
+    margin-bottom: 3rem;
+    max-width: 700px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.subtitle {
-    font-size: 1.5rem;
-    color: var(--foreground-muted);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
+.highlight {
+    color: white;
+    font-weight: 600;
 }
 
-.highlight {
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.primaryButton {
+    background: linear-gradient(to right, var(--primary), #2563eb);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(34, 211, 238, 0.3);
+}
+
+.primaryButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(34, 211, 238, 0.5);
+}
+
+.secondaryButton {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--foreground-muted);
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.secondaryButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.floatingIcons {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    height: 120px;
+    margin-top: 4rem;
+}
+
+.floatItem {
+    position: absolute;
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    animation: float 6s ease-in-out infinite;
+}
+
+.floatItem.active {
+    border-color: rgba(34, 211, 238, 0.4);
     color: var(--primary);
     font-weight: 700;
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
 }
 
-@keyframes floatLogo {
+@keyframes ping {
+    75%, 100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-15px); }
 }

@@ -1,12 +1,11 @@
 ﻿"use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
-import StorySection from "@/components/StorySection";
-import TrustSection from "@/components/TrustSection";
+import StorySection from "@/components/StorySection"; // Now Features
+import SmartSearchDemo from "@/components/SmartSearchDemo"; // New
 import TestimonialsSection from "@/components/TestimonialsSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
@@ -23,9 +22,9 @@ export default function HomeClient({ product }: HomeClientProps) {
 
     const handlePreOrder = () => {
         addItem({
-            id: "perplexity-pro-1year",
+            id: product?.id || "perplexity-pro-1year",
             name: product?.name || "Perplexity Pro Subscription",
-            price: product?.price || 299000
+            price: product?.price || 398000
         });
         router.push("/cart");
     };
@@ -34,8 +33,8 @@ export default function HomeClient({ product }: HomeClientProps) {
         <main>
             <Navbar onPreOrder={handlePreOrder} />
             <Hero onPreOrder={handlePreOrder} />
+            <SmartSearchDemo />
             <StorySection />
-            <TrustSection />
             <PricingSection product={product} />
             <FAQSection />
             <TestimonialsSection />
