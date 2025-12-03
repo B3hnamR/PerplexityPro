@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import { Vazirmatn } from "next/font/google";
 import "./globals.css";
+import Providers from "@/components/Providers";
 
-const vazirmatn = Vazirmatn({ subsets: ["arabic", "latin"] });
+// تنظیم فونت وزیرمتن با متغیر CSS
+const vazirmatn = Vazirmatn({ 
+  subsets: ["arabic", "latin"],
+  variable: "--font-vazir", // تعریف متغیر
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "لومینا - صدای بی‌نهایت",
-  description: "هدفون بی‌سیم لومینا با کیفیت صدای استودیویی و حذف نویز فعال.",
+  title: "Perplexity Pro - خرید اشتراک",
+  description: "دسترسی به قدرتمندترین مدل‌های هوش مصنوعی جهان",
 };
-
-import Providers from "@/components/Providers";
 
 export default function RootLayout({
   children,
@@ -18,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
-      <body className={vazirmatn.className} suppressHydrationWarning>
+      <body className={`${vazirmatn.variable} font-sans`} suppressHydrationWarning>
         <Providers>
           {children}
         </Providers>
