@@ -27,7 +27,7 @@ export async function GET(
             return NextResponse.json({ error: "Order not found" }, { status: 404 });
         }
 
-        // اگر سیستم شما آیتم‌های سفارش جداگانه ندارد، از اطلاعات خود سفارش یک آیتم می‌سازیم
+        // تبدیل داده به فرمت مورد انتظار کلاینت
         const formattedOrder = {
             ...order,
             items: [
