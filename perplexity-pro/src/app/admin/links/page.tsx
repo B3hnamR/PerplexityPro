@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Link as LinkIcon, Loader2, Copy, CheckCircle } from "lucide-react";
+import { Plus, Trash2, Link as LinkIcon, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 interface LinkItem {
     id: string;
@@ -16,153 +16,123 @@ export default function LinksPage() {
     const [loading, setLoading] = useState(true);
     const [adding, setAdding] = useState(false);
 
-    useEffect(() => {
-        fetchLinks();
-    }, []);
+    useEffect(() => { fetchLinks(); }, []);
 
     const fetchLinks = async () => {
         try {
             const res = await fetch("/api/admin/links");
-            if (!res.ok) throw new Error("Failed to fetch links");
             const data = await res.json();
-            // اگر دیتای بازگشتی ساختار متفاوتی دارد (مثل latest)، اینجا اصلاح می‌کنیم
-            const linksList = Array.isArray(data) ? data : (data.latest || []);
-            setLinks(linksList);
-        } catch (error) {
-            console.error("Error fetching links:", error);
-        } finally {
-            setLoading(false);
-        }
+            setLinks(Array.isArray(data) ? data : (data.latest || []));
+        } catch (error) { console.error(error); } finally { setLoading(false); }
     };
 
     const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newLink.trim()) return;
-        
         setAdding(true);
         try {
-            // پشتیبانی از افزودن چند خطی
             const lines = newLink.split('\n').filter(line => line.trim() !== '');
-            
             await fetch("/api/admin/links", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ links: lines }), // ارسال به صورت آرایه برای سازگاری با API
+                body: JSON.stringify({ links: lines }),
             });
             setNewLink("");
             fetchLinks();
-        } catch (error) {
-            console.error(error);
-            alert("خطا در افزودن لینک");
-        } finally {
-            setAdding(false);
-        }
+        } catch (error) { alert("خطا"); } finally { setAdding(false); }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("آیا از حذف این لینک مطمئن هستید؟")) return;
-        try {
-            await fetch(`/api/admin/links?id=${id}`, { method: "DELETE" });
-            setLinks(links.filter((l) => l.id !== id));
-        } catch (error) {
-            console.error(error);
-        }
+        if (!confirm("حذف شود؟")) return;
+        await fetch(`/api/admin/links?id=${id}`, { method: "DELETE" });
+        setLinks(links.filter((l) => l.id !== id));
     };
 
     return (
-        <div className="animate-fade-in max-w-5xl mx-auto">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="animate-fade-in max-w-5xl mx-auto space-y-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-white mb-2 flex items-center gap-3">
-                        <LinkIcon className="text-cyan-400" />
-                        انبار لینک‌ها (تحویل آنی)
+                    <h1 className="text-3xl font-black text-white mb-2 flex items-center gap-2">
+                        <LinkIcon className="text-cyan-400" /> انبار لینک‌ها
                     </h1>
-                    <p className="text-gray-400">لینک‌هایی که اینجا اضافه می‌کنید، پس از خرید به صورت خودکار به مشتری تحویل داده می‌شوند.</p>
+                    <p className="text-gray-400 text-sm">مدیریت لینک‌های تحویل خودکار (لایسنس‌ها)</p>
                 </div>
-                <div className="bg-[#1e293b] px-5 py-3 rounded-xl border border-white/10 shadow-lg flex items-center gap-3">
-                    <span className="text-gray-400 text-sm">موجودی فعلی:</span>
+                <div className="bg-[#1e293b] px-6 py-3 rounded-2xl border border-white/10 flex flex-col items-center min-w-[140px]">
+                    <span className="text-xs text-gray-400 mb-1">موجودی فعال</span>
                     <span className="text-3xl font-black text-emerald-400">{links.filter(l => !l.isUsed).length}</span>
                 </div>
             </div>
 
-            {/* Add New Link Form */}
-            <div className="bg-[#1e293b] p-6 rounded-2xl border border-white/5 mb-8 shadow-lg">
-                <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                    <Plus size={18} className="text-cyan-400" />
-                    افزودن لینک جدید
-                </h3>
-                <form onSubmit={handleAdd} className="flex flex-col gap-4">
-                    <textarea
-                        value={newLink}
-                        onChange={(e) => setNewLink(e.target.value)}
-                        placeholder="لینک لایسنس یا توکن فعال‌سازی را اینجا وارد کنید... (می‌توانید چند لینک را در خطوط جداگانه وارد کنید)"
-                        className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none transition-colors dir-ltr text-left min-h-[120px] font-mono text-sm"
-                    />
-                    <div className="flex justify-end">
-                        <button
-                            type="submit"
-                            disabled={adding || !newLink.trim()}
-                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {adding ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
-                            افزودن به انبار
-                        </button>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Form */}
+                <div className="lg:col-span-1">
+                    <div className="bg-[#1e293b] p-6 rounded-3xl border border-white/5 shadow-xl sticky top-8">
+                        <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                            <Plus size={18} className="text-cyan-400" /> افزودن جدید
+                        </h3>
+                        <form onSubmit={handleAdd} className="space-y-4">
+                            <textarea
+                                value={newLink}
+                                onChange={(e) => setNewLink(e.target.value)}
+                                placeholder="لینک‌ها را وارد کنید (هر خط یک لینک)..."
+                                className="w-full bg-[#0f172a] border border-white/10 rounded-xl p-4 text-white text-sm focus:border-cyan-500 focus:outline-none min-h-[150px] font-mono dir-ltr placeholder:text-right"
+                            />
+                            <button
+                                type="submit"
+                                disabled={adding || !newLink.trim()}
+                                className="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                            >
+                                {adding ? <Loader2 className="animate-spin" size={18}/> : "افزودن به انبار"}
+                            </button>
+                        </form>
                     </div>
-                </form>
-            </div>
-
-            {/* Links List */}
-            <div className="bg-[#1e293b] rounded-2xl border border-white/5 overflow-hidden shadow-xl">
-                <div className="p-4 border-b border-white/5 bg-[#0f172a]/50">
-                    <h3 className="font-bold text-gray-300">لیست موجودی</h3>
                 </div>
-                
-                {loading ? (
-                    <div className="text-center p-12 text-gray-400 flex flex-col items-center gap-3">
-                        <Loader2 className="animate-spin text-cyan-400" size={32} />
-                        <span>در حال بارگذاری انبار...</span>
-                    </div>
-                ) : links.length === 0 ? (
-                    <div className="text-center p-16 text-gray-500 bg-[#1e293b]/50">
-                        <LinkIcon size={48} className="mx-auto mb-4 opacity-20" />
-                        <p>هیچ لینکی در انبار موجود نیست.</p>
-                    </div>
-                ) : (
-                    <div className="divide-y divide-white/5 max-h-[600px] overflow-y-auto custom-scrollbar">
-                        {links.map((link) => (
-                            <div key={link.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors group">
-                                <div className="flex-1 min-w-0 ml-4">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                            link.isUsed 
-                                            ? "bg-red-500/10 text-red-400 border border-red-500/20" 
-                                            : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                        }`}>
-                                            {link.isUsed ? (
-                                                <>استفاده شده</>
-                                            ) : (
-                                                <><CheckCircle size={10} /> موجود</>
-                                            )}
-                                        </span>
-                                        <span className="text-xs text-gray-500 font-mono">
-                                            {new Date(link.createdAt).toLocaleDateString('fa-IR')}
-                                        </span>
-                                    </div>
-                                    <div className="font-mono text-sm text-gray-300 truncate dir-ltr text-left bg-[#0f172a] p-2 rounded-lg border border-white/5 select-all" title={link.url}>
-                                        {link.url}
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => handleDelete(link.id)}
-                                    className="p-2.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
-                                    title="حذف لینک"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
+
+                {/* List */}
+                <div className="lg:col-span-2">
+                    <div className="bg-[#1e293b] rounded-3xl border border-white/5 overflow-hidden shadow-xl">
+                        <div className="p-5 border-b border-white/5 bg-[#0f172a]/30">
+                            <h3 className="font-bold text-gray-200">لیست کلی</h3>
+                        </div>
+                        {loading ? (
+                            <div className="p-10 text-center text-gray-500">در حال بارگذاری...</div>
+                        ) : links.length === 0 ? (
+                            <div className="p-10 text-center text-gray-500 flex flex-col items-center gap-2">
+                                <AlertCircle size={32} opacity={0.5} />
+                                <p>انباری خالی است.</p>
                             </div>
-                        ))}
+                        ) : (
+                            <div className="divide-y divide-white/5 max-h-[600px] overflow-y-auto custom-scrollbar">
+                                {links.map((link) => (
+                                    <div key={link.id} className="p-4 hover:bg-white/5 transition-colors group flex items-start gap-4">
+                                        <div className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${link.isUsed ? "bg-red-500" : "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"}`} />
+                                        
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1.5">
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full border ${link.isUsed ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"}`}>
+                                                    {link.isUsed ? "فروخته شده" : "موجود"}
+                                                </span>
+                                                <span className="text-[10px] text-gray-600 font-mono">
+                                                    {new Date(link.createdAt).toLocaleDateString('fa-IR')}
+                                                </span>
+                                            </div>
+                                            <div className="bg-[#0f172a] p-2.5 rounded-lg border border-white/5 font-mono text-xs text-gray-300 break-all dir-ltr text-left leading-relaxed">
+                                                {link.url}
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => handleDelete(link.id)}
+                                            className="p-2 text-gray-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

@@ -3,6 +3,8 @@ import { verifyPayment } from "@/lib/zarinpal";
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const authority = searchParams.get("Authority");
@@ -13,47 +15,53 @@ export async function GET(req: Request) {
     }
 
     try {
-        // Find the pending order
         const order = await prisma.order.findFirst({
-            where: { refId: authority }, // We stored authority in refId temporarily
+            where: { refId: authority },
         });
 
         if (!order) {
             return NextResponse.redirect(new URL("/payment/failed?error=OrderNotFound", req.url));
         }
 
+        // جلوگیری از پردازش مجدد سفارش پرداخت شده
+        if (order.status === "PAID" && order.downloadToken) {
+             return NextResponse.redirect(new URL(`/delivery/${order.downloadToken}`, req.url));
+        }
+
         const response = await verifyPayment(authority, order.amount);
 
         if (response.data && (response.data.code === 100 || response.data.code === 101)) {
-            // Generate secure download token
             const downloadToken = crypto.randomBytes(32).toString("hex");
 
-            // Fetch available links equal to quantity
-            const links = await (prisma as any).downloadLink.findMany({
+            // 1. دریافت لینک‌های موجود
+            const links = await prisma.downloadLink.findMany({
                 where: { status: "AVAILABLE" },
                 take: order.quantity,
             });
 
-            // Assign links if available
+            // 2. آپدیت وضعیت لینک‌ها به "فروخته شده"
             if (links.length > 0) {
-                const linkIds = links.map((l: any) => l.id);
-                await (prisma as any).downloadLink.updateMany({
+                const linkIds = links.map((l) => l.id);
+                await prisma.downloadLink.updateMany({
                     where: { id: { in: linkIds } },
-                    data: { status: "USED", orderId: order.id, consumedAt: new Date() },
+                    data: { 
+                        status: "USED", 
+                        orderId: order.id, 
+                        consumedAt: new Date() 
+                    },
                 });
             }
 
-            // Update order
-            const updated = await prisma.order.update({
+            // 3. آپدیت وضعیت سفارش
+            await prisma.order.update({
                 where: { id: order.id },
                 data: {
                     status: "PAID",
-                    refId: String(response.data.ref_id), // Update with actual RefID
+                    refId: String(response.data.ref_id),
                     downloadToken,
                 },
             });
 
-            // Redirect به صفحه تحویل
             const deliveryUrl = new URL(`/delivery/${downloadToken}`, req.url);
             if (links.length < order.quantity) {
                 deliveryUrl.searchParams.set("nostock", "1");
@@ -63,8 +71,7 @@ export async function GET(req: Request) {
             return NextResponse.redirect(new URL("/payment/failed", req.url));
         }
     } catch (error) {
-        console.error(error);
+        console.error("Verification Error:", error);
         return NextResponse.redirect(new URL("/payment/failed?error=InternalError", req.url));
     }
 }
-

@@ -10,24 +10,33 @@ import {
     Plus,
     ShoppingBag,
     Trash2,
-    ShieldCheck,
-    Check
+    ShieldCheck
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function CartPage() {
-    const { items, removeItem, updateQuantity, total, count } = useCart();
+    const { items, removeItem, updateQuantity, total, count, addItem } = useCart();
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const formatPrice = (value: number) => value.toLocaleString("fa-IR");
 
+    const handlePreOrder = () => {
+        if (items.length === 0) {
+            addItem({
+                id: "perplexity-pro-1year",
+                name: "Perplexity Pro Subscription",
+                price: 398000
+            });
+        }
+        setIsCheckoutOpen(true);
+    };
+
     return (
         <main className="min-h-screen bg-[#0f172a] text-white pb-20 font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
-            {/* Navbar is included directly for consistent layout */}
-            <Navbar onPreOrder={() => setIsCheckoutOpen(true)} />
+            <Navbar onPreOrder={handlePreOrder} />
 
             <div className="pt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Page Header */}
+                {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fade-in">
                     <div>
                         <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-3">
@@ -35,7 +44,7 @@ export default function CartPage() {
                         </span>
                         <h1 className="text-3xl md:text-4xl font-black text-white mb-2">سبد خرید شما</h1>
                         <p className="text-gray-400 max-w-2xl leading-relaxed">
-                            سبد را یک نگاه مرور کنید و در چند گام کوتاه پرداخت را نهایی کنید؛ همه چیز در تم Perplexity Pro با پرداخت امن و تحویل فوری.
+                            سبد را مرور کنید و در چند گام کوتاه پرداخت را نهایی کنید؛ همه چیز با پرداخت امن و تحویل فوری.
                         </p>
                     </div>
                     
@@ -49,13 +58,12 @@ export default function CartPage() {
                 </div>
 
                 {items.length === 0 ? (
-                    /* Empty State */
                     <div className="bg-[#1e293b]/30 border border-white/5 rounded-3xl p-12 text-center max-w-2xl mx-auto animate-fade-in-up">
                         <div className="w-24 h-24 bg-[#1e293b] rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/5 shadow-lg">
                             <ShoppingBag size={48} className="text-gray-600" />
                         </div>
                         <h2 className="text-2xl font-bold text-white mb-2">سبد خرید شما خالی است</h2>
-                        <p className="text-gray-400 mb-8">هنوز هیچ محصولی انتخاب نکرده‌اید. برای دسترسی به قابلیت‌های هوش مصنوعی، یک اشتراک تهیه کنید.</p>
+                        <p className="text-gray-400 mb-8">هنوز هیچ محصولی انتخاب نکرده‌اید.</p>
                         <Link 
                             href="/" 
                             className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white px-6 py-3 rounded-xl font-bold transition-all"
@@ -79,9 +87,8 @@ export default function CartPage() {
                                 <div className="space-y-6">
                                     {items.map((item) => (
                                         <div key={item.id} className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/5 last:border-0 last:pb-0">
-                                            {/* Product Image Placeholder */}
                                             <div className="w-20 h-20 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-xl border border-white/10 flex items-center justify-center flex-shrink-0">
-                                                <img src="/perplexity-icon.svg" alt="Product" className="w-10 h-10 opacity-80" onError={(e) => e.currentTarget.style.display='none'} />
+                                                <img src="/perplexity-pro-logo.png" alt="Product" className="w-16 h-auto opacity-90" onError={(e) => e.currentTarget.style.display='none'} />
                                             </div>
                                             
                                             <div className="flex-1 text-center sm:text-right w-full">
@@ -93,7 +100,6 @@ export default function CartPage() {
                                             </div>
 
                                             <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                                                {/* Quantity Controls */}
                                                 <div className="flex items-center bg-[#0f172a] rounded-lg border border-white/10 p-1">
                                                     <button
                                                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
@@ -132,18 +138,6 @@ export default function CartPage() {
                         {/* Left Column: Summary */}
                         <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
                             <div className="bg-[#1e293b] border border-white/10 rounded-2xl p-6 sticky top-24 shadow-xl">
-                                {/* Coupon Section */}
-                                <div className="flex gap-2 mb-6">
-                                    <input 
-                                        type="text" 
-                                        placeholder="کد تخفیف دارید؟" 
-                                        className="flex-1 bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors placeholder-gray-600"
-                                    />
-                                    <button className="bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-400 px-4 rounded-xl font-bold text-sm transition-all">
-                                        اعمال
-                                    </button>
-                                </div>
-
                                 <div className="space-y-3 mb-6 pb-6 border-b border-white/5">
                                     <div className="flex justify-between text-gray-400 text-sm">
                                         <span>قیمت کالاها ({formatPrice(count)})</span>
@@ -161,11 +155,6 @@ export default function CartPage() {
                                         <span className="block text-2xl font-black text-cyan-400">{formatPrice(total)}</span>
                                         <span className="text-xs text-gray-500">تومان</span>
                                     </div>
-                                </div>
-
-                                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-6 text-xs text-blue-200 leading-relaxed flex gap-3">
-                                    <div className="flex-shrink-0 mt-0.5 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] font-bold text-[#0f172a]">i</div>
-                                    پرداخت شما در بستر امن زرین‌پال انجام می‌شود و لینک دسترسی بلافاصله بعد از تکمیل پرداخت به ایمیل شما ارسال خواهد شد.
                                 </div>
 
                                 <button
