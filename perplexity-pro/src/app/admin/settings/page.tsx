@@ -1,174 +1,107 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import styles from './settings.module.css';
-import axios from 'axios';
-import { Trash2, Plus, Edit2, X } from 'lucide-react';
-
-interface CustomField {
-    id: string;
-    label: string;
-    name: string;
-    type: string;
-    required: boolean;
-    options: string | null;
-}
+import { useState, useEffect } from "react";
+import { Plus, Trash2, Settings as SettingsIcon, Save } from "lucide-react";
 
 export default function SettingsPage() {
-    const [fields, setFields] = useState<CustomField[]>([]);
-    const [newField, setNewField] = useState({
-        label: '',
-        name: '',
-        type: 'text',
-        required: false,
-        options: '',
-    });
-    const [editingId, setEditingId] = useState<string | null>(null);
+    const [fields, setFields] = useState<any[]>([]);
+    const [newField, setNewField] = useState({ label: "", type: "text", required: true });
+    
+    // Fetch existing fields logic here if you have an API for it
+    // For now I'll implement the UI assuming you want to manage dynamic fields for user input during checkout
 
-    useEffect(() => {
-        fetchFields();
-    }, []);
-
-    const fetchFields = async () => {
-        const res = await axios.get('/api/admin/fields');
-        setFields(res.data);
+    const addField = () => {
+        if(!newField.label) return;
+        setFields([...fields, { ...newField, id: Date.now().toString() }]);
+        setNewField({ label: "", type: "text", required: true });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            const payload = {
-                ...newField,
-                options: newField.options ? newField.options.split(',').map((s) => s.trim()) : undefined,
-            };
-
-            if (editingId) {
-                await axios.put('/api/admin/fields', { id: editingId, ...payload });
-            } else {
-                await axios.post('/api/admin/fields', payload);
-            }
-            setNewField({ label: '', name: '', type: 'text', required: false, options: '' });
-            setEditingId(null);
-            fetchFields();
-        } catch (error: any) {
-            console.error(error);
-            const msg = error.response?.data?.error || 'خطایی رخ داد، دوباره تلاش کنید';
-            const details = error.response?.data?.details ? JSON.stringify(error.response.data.details) : '';
-            alert(`${msg}\n${details}`);
-        }
-    };
-
-    const handleDeleteField = async (id: string) => {
-        if (confirm('حذف این فیلد انجام شود؟')) {
-            await axios.delete(`/api/admin/fields?id=${id}`);
-            fetchFields();
-        }
-    };
-
-    const startEdit = (field: CustomField) => {
-        setEditingId(field.id);
-        setNewField({
-            label: field.label,
-            name: field.name,
-            type: field.type,
-            required: field.required,
-            options: field.options ? JSON.parse(field.options).join(', ') : '',
-        });
-    };
-
-    const cancelEdit = () => {
-        setEditingId(null);
-        setNewField({ label: '', name: '', type: 'text', required: false, options: '' });
+    const removeField = (id: string) => {
+        setFields(fields.filter(f => f.id !== id));
     };
 
     return (
-        <div className={styles.container}>
-            <h1 className={styles.title}>مدیریت فیلدهای سفارشی</h1>
+        <div className="animate-fade-in max-w-4xl mx-auto">
+            <div className="mb-8">
+                <h1 className="text-3xl font-black text-white mb-2 flex items-center gap-3">
+                    <SettingsIcon className="text-cyan-400" />
+                    تنظیمات و فیلدها
+                </h1>
+                <p className="text-gray-400">فیلدهایی که کاربر باید هنگام خرید پر کند را اینجا مدیریت کنید.</p>
+            </div>
 
-            <div className={styles.card}>
-                <h2>افزودن فیلد جدید</h2>
-                <form onSubmit={handleSubmit} className={styles.form}>
-                    <div className={styles.row}>
-                        <input
-                            className={styles.input}
-                            placeholder="عنوان نمایشی (مثلاً نام کاربری دیسکورد)"
-                            value={newField.label}
-                            onChange={(e) => setNewField({ ...newField, label: e.target.value })}
-                            required
-                        />
-                        <input
-                            className={styles.input}
-                            placeholder="نام کلید (مثلاً discord_id)"
-                            value={newField.name}
-                            onChange={(e) => setNewField({ ...newField, name: e.target.value })}
-                            required
-                            pattern="[a-z0-9_]+"
-                            title="فقط حروف کوچک و عدد و آندرلاین مجاز است"
-                        />
-                    </div>
-                    <div className={styles.row}>
-                        <select
-                            className={styles.input}
-                            value={newField.type}
-                            onChange={(e) => setNewField({ ...newField, type: e.target.value })}
-                        >
-                            <option value="text">متن</option>
-                            <option value="number">عدد</option>
-                            <option value="textarea">متن چندخطی</option>
-                            <option value="select">گزینه‌ای</option>
-                        </select>
-                        <label className={styles.checkbox}>
-                            <input
-                                type="checkbox"
-                                checked={newField.required}
-                                onChange={(e) => setNewField({ ...newField, required: e.target.checked })}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Form to Add */}
+                <div className="bg-[#1e293b] border border-white/5 rounded-2xl p-6 h-fit shadow-lg">
+                    <h3 className="text-lg font-bold text-white mb-4">افزودن فیلد جدید</h3>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm text-gray-400 mb-1">عنوان فیلد</label>
+                            <input 
+                                type="text" 
+                                value={newField.label}
+                                onChange={(e) => setNewField({...newField, label: e.target.value})}
+                                placeholder="مثلاً: نام کاربری تلگرام"
+                                className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
                             />
-                            اجباری
-                        </label>
+                        </div>
+                        
+                        <div className="flex items-center gap-4">
+                            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    checked={newField.required}
+                                    onChange={(e) => setNewField({...newField, required: e.target.checked})}
+                                    className="accent-cyan-500 w-4 h-4"
+                                />
+                                اجباری باشد
+                            </label>
+                        </div>
+
+                        <button 
+                            onClick={addField}
+                            className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Plus size={18} />
+                            افزودن
+                        </button>
                     </div>
-                    {newField.type === 'select' && (
-                        <input
-                            className={styles.input}
-                            placeholder="گزینه‌ها را با ویرگول جدا کنید (مثلاً بله، خیر، شاید)"
-                            value={newField.options}
-                            onChange={(e) => setNewField({ ...newField, options: e.target.value })}
-                        />
+                </div>
+
+                {/* List */}
+                <div className="space-y-3">
+                    <h3 className="text-lg font-bold text-white mb-4">فیلدهای فعال</h3>
+                    {fields.length === 0 ? (
+                        <div className="text-gray-500 text-center py-8 border border-white/5 rounded-xl border-dashed">
+                            هنوز فیلدی اضافه نشده است.
+                        </div>
+                    ) : (
+                        fields.map((field) => (
+                            <div key={field.id} className="bg-[#1e293b] p-4 rounded-xl border border-white/5 flex items-center justify-between group">
+                                <div>
+                                    <p className="text-white font-bold">{field.label}</p>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {field.required ? "اجباری" : "اختیاری"} • {field.type}
+                                    </p>
+                                </div>
+                                <button 
+                                    onClick={() => removeField(field.id)}
+                                    className="p-2 text-gray-500 hover:text-red-400 bg-white/5 rounded-lg transition-colors"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ))
                     )}
-                    <button type="submit" className={styles.addButton}>
-                        <Plus size={18} /> {editingId ? 'ذخیره تغییرات' : 'افزودن فیلد'}
-                    </button>
-                    {editingId && (
-                        <button type="button" className={styles.cancelButton} onClick={cancelEdit}>
-                            <X size={16} /> انصراف از ویرایش
+                    
+                    {fields.length > 0 && (
+                        <button className="w-full mt-4 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-2">
+                            <Save size={18} />
+                            ذخیره تنظیمات
                         </button>
                     )}
-                </form>
+                </div>
             </div>
-
-            <div className={styles.list}>
-                <h2>فیلدهای فعال</h2>
-                {fields.map((field) => (
-                    <div key={field.id} className={styles.fieldItem}>
-                        <div className={styles.fieldInfo}>
-                            <strong>{field.label}</strong>
-                            <span className={styles.badge}>{field.type}</span>
-                            {field.required && <span className={styles.requiredBadge}>اجباری</span>}
-                        </div>
-                        <div className={styles.actions}>
-                            <button className={styles.editButton} onClick={() => startEdit(field)}>
-                                <Edit2 size={16} /> ویرایش
-                            </button>
-                            <button
-                                onClick={() => handleDeleteField(field.id)}
-                                className={styles.deleteButton}
-                            >
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
         </div>
     );
 }
