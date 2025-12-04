@@ -23,7 +23,6 @@ export async function GET(req: Request) {
             return NextResponse.redirect(new URL("/payment/failed?error=OrderNotFound", req.url));
         }
 
-        // جلوگیری از پردازش مجدد سفارش پرداخت شده
         if (order.status === "PAID" && order.downloadToken) {
              return NextResponse.redirect(new URL(`/delivery/${order.downloadToken}`, req.url));
         }
@@ -33,15 +32,16 @@ export async function GET(req: Request) {
         if (response.data && (response.data.code === 100 || response.data.code === 101)) {
             const downloadToken = crypto.randomBytes(32).toString("hex");
 
-            // 1. دریافت لینک‌های موجود
-            const links = await prisma.downloadLink.findMany({
+            // 1. برداشتن لینک‌های موجود به تعداد سفارش
+            const linksToDeliver = await prisma.downloadLink.findMany({
                 where: { status: "AVAILABLE" },
                 take: order.quantity,
             });
 
-            // 2. آپدیت وضعیت لینک‌ها به "فروخته شده"
-            if (links.length > 0) {
-                const linkIds = links.map((l) => l.id);
+            // 2. تغییر وضعیت لینک‌ها به "فروخته شده"
+            // نکته: این عملیات باید قبل از نمایش صفحه موفقیت انجام شود
+            if (linksToDeliver.length > 0) {
+                const linkIds = linksToDeliver.map((l) => l.id);
                 await prisma.downloadLink.updateMany({
                     where: { id: { in: linkIds } },
                     data: { 
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
                 });
             }
 
-            // 3. آپدیت وضعیت سفارش
+            // 3. آپدیت نهایی سفارش
             await prisma.order.update({
                 where: { id: order.id },
                 data: {
@@ -63,7 +63,8 @@ export async function GET(req: Request) {
             });
 
             const deliveryUrl = new URL(`/delivery/${downloadToken}`, req.url);
-            if (links.length < order.quantity) {
+            // اگر موجودی کمتر از تعداد درخواستی بود، پارامتر nostock اضافه می‌شود
+            if (linksToDeliver.length < order.quantity) {
                 deliveryUrl.searchParams.set("nostock", "1");
             }
             return NextResponse.redirect(deliveryUrl);
