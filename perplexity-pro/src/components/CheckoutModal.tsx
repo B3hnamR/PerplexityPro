@@ -123,12 +123,18 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
                                     type="tel" value={mobile} onChange={e => setMobile(e.target.value)}
                                     className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-white text-center text-xl tracking-widest placeholder-gray-600 focus:border-cyan-500 focus:outline-none transition-colors dir-ltr"
                                     placeholder="0912..." autoFocus
+                                    dir="ltr" // ✅ چپ‌چین شدن تضمینی شماره
                                 />
                                 <Smartphone className="absolute left-3 top-3.5 text-gray-500" size={20} />
                             </div>
                             <button disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2">
                                 {loading ? <Loader2 className="animate-spin" /> : "ارسال کد تایید"}
                             </button>
+                            
+                            {/* لینک ورود مدیران */}
+                            <div className="text-center pt-2">
+                                <a href="/auth/login" className="text-xs text-gray-500 hover:text-cyan-400 transition-colors">ورود مدیران</a>
+                            </div>
                         </form>
                     )}
 
