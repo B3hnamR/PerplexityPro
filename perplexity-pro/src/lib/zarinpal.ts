@@ -1,7 +1,11 @@
 export const zarinpalConfig = {
-    merchantId: process.env.ZARINPAL_MERCHANT_ID || "41560e45-4217-437d-90fe-270293791227",
-    sandbox: process.env.ZARINPAL_SANDBOX === "true", // ✅ خواندن از Env
+    merchantId: process.env.ZARINPAL_MERCHANT_ID!,
+    sandbox: process.env.ZARINPAL_SANDBOX === "true",
 };
+
+if (!zarinpalConfig.merchantId && process.env.NODE_ENV === "production") {
+    throw new Error("ZARINPAL_MERCHANT_ID is not set in environment variables.");
+}
 
 export async function requestPayment(amount: number, description: string, callbackUrl: string, email?: string, mobile?: string) {
     const url = zarinpalConfig.sandbox

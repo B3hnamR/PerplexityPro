@@ -10,25 +10,36 @@ export async function GET(req: Request) {
     const authority = searchParams.get("Authority");
     const status = searchParams.get("Status");
 
-    // ✅ پیدا کردن سفارش قبل از هر کاری
-    const order = authority ? await prisma.order.findFirst({ where: { refId: authority } }) : null;
+    // پیدا کردن سفارش بر اساس شناسه پرداخت
+    const order = authority ? await prisma.order.findFirst({ 
+        where: { refId: authority },
+        include: { links: true } // لینک‌های رزرو شده را هم می‌گیریم
+    }) : null;
 
     if (!order) {
         return NextResponse.redirect(new URL("/payment/failed?error=OrderNotFound", req.url));
     }
 
-    // ✅ اگر وضعیت OK نبود، سفارش را FAILED کن
-    if (status !== "OK") {
-        await prisma.order.update({
-            where: { id: order.id },
-            data: { status: "FAILED" }
-        });
-        return NextResponse.redirect(new URL("/payment/failed", req.url));
-    }
-
-    // اگر قبلا پرداخت شده، دوباره پردازش نکن
+    // اگر قبلا پرداخت شده، ریدایرکت کن
     if (order.status === "PAID" && order.downloadToken) {
          return NextResponse.redirect(new URL(`/delivery/${order.downloadToken}`, req.url));
+    }
+
+    // تابع کمکی برای آزادسازی لینک‌ها در صورت خطا
+    const releaseLinks = async () => {
+        if (order.links.length > 0) {
+            await prisma.downloadLink.updateMany({
+                where: { orderId: order.id },
+                data: { status: "AVAILABLE", orderId: null } // قطع ارتباط و آزاد کردن
+            });
+        }
+        await prisma.order.update({ where: { id: order.id }, data: { status: "FAILED" } });
+    };
+
+    // اگر کاربر انصراف داده یا پرداخت ناموفق بوده
+    if (status !== "OK") {
+        await releaseLinks();
+        return NextResponse.redirect(new URL("/payment/failed", req.url));
     }
 
     try {
@@ -37,20 +48,19 @@ export async function GET(req: Request) {
         if (response.data && (response.data.code === 100 || response.data.code === 101)) {
             const downloadToken = crypto.randomBytes(32).toString("hex");
 
-            // کسر از انبار
-            const linksToDeliver = await prisma.downloadLink.findMany({
-                where: { status: "AVAILABLE" },
-                take: order.quantity,
-            });
-
-            if (linksToDeliver.length > 0) {
-                const linkIds = linksToDeliver.map((l) => l.id);
+            // ✅ نهایی کردن خرید: تغییر وضعیت لینک‌های رزرو شده به USED
+            if (order.links.length > 0) {
+                const linkIds = order.links.map(l => l.id);
                 await prisma.downloadLink.updateMany({
                     where: { id: { in: linkIds } },
-                    data: { status: "USED", orderId: order.id, consumedAt: new Date() },
+                    data: { 
+                        status: "USED", 
+                        consumedAt: new Date() 
+                    },
                 });
             }
 
+            // آپدیت سفارش به پرداخت شده
             await prisma.order.update({
                 where: { id: order.id },
                 data: {
@@ -60,18 +70,17 @@ export async function GET(req: Request) {
                 },
             });
 
-            const deliveryUrl = new URL(`/delivery/${downloadToken}`, req.url);
-            if (linksToDeliver.length < order.quantity) {
-                deliveryUrl.searchParams.set("nostock", "1");
-            }
-            return NextResponse.redirect(deliveryUrl);
+            return NextResponse.redirect(new URL(`/delivery/${downloadToken}`, req.url));
         } else {
-            // ✅ اگر تایید بانک خطا داد
-            await prisma.order.update({ where: { id: order.id }, data: { status: "FAILED" } });
+            // پرداخت توسط بانک تایید نشد
+            await releaseLinks();
             return NextResponse.redirect(new URL("/payment/failed", req.url));
         }
     } catch (error) {
         console.error("Verify Error:", error);
+        // در صورت خطای سرور هم محض احتیاط لینک‌ها را آزاد می‌کنیم (یا می‌توان نگه داشت برای بررسی دستی)
+        // اما برای تجربه کاربری بهتر است آزاد شوند تا دوباره تلاش کند
+        await releaseLinks();
         return NextResponse.redirect(new URL("/payment/failed?error=InternalError", req.url));
     }
 }

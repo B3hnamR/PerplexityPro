@@ -1,43 +1,53 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import fs from "fs";
-import path from "path";
+import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: Promise<{ token: string }> }) {
-    const { token } = await params;
+export async function GET(
+    req: Request,
+    { params }: { params: Promise<{ token: string }> }
+) {
+    try {
+        const { token } = await params;
 
-    // Find order by download token
-    const order = await prisma.order.findUnique({
-        where: { downloadToken: token },
-    });
+        // 1. اعتبارسنجی توکن
+        const order = await prisma.order.findUnique({
+            where: { downloadToken: token },
+            include: { links: true } // دریافت لینک‌های محصول
+        });
 
-    if (!order || order.status !== "PAID") {
-        return new NextResponse("Invalid or expired link", { status: 403 });
+        if (!order || order.status !== "PAID") {
+            return new NextResponse("Link Expired or Invalid", { status: 403 });
+        }
+
+        // 2. تولید محتوای فایل در حافظه (بدون ذخیره روی دیسک)
+        // محتوای فایل متنی شامل لینک‌های خریداری شده
+        const fileContent = `
+سپاس از خرید شما از Perplexity Pro
+------------------------------------------------
+شماره سفارش: ${order.trackingCode}
+تاریخ: ${new Date(order.createdAt).toLocaleDateString('fa-IR')}
+------------------------------------------------
+لایسنس‌های شما:
+${order.links.map((l, i) => `${i + 1}. ${l.url}`).join('\n')}
+------------------------------------------------
+با تشکر
+        `.trim();
+
+        // 3. آپدیت تعداد دانلود (اختیاری)
+        await prisma.order.update({
+            where: { id: order.id },
+            data: { downloadCount: { increment: 1 } }
+        });
+
+        // 4. ارسال فایل به کاربر
+        return new NextResponse(fileContent, {
+            headers: {
+                "Content-Type": "text/plain; charset=utf-8",
+                "Content-Disposition": `attachment; filename="PerplexityPro-License-${order.trackingCode}.txt"`,
+            },
+        });
+
+    } catch (error) {
+        console.error("Download Error:", error);
+        return new NextResponse("Internal Server Error", { status: 500 });
     }
-
-    // Increment download count
-    await prisma.order.update({
-        where: { id: order.id },
-        data: { downloadCount: { increment: 1 } },
-    });
-
-    // Serve the file
-    // In a real app, this file path should be dynamic or stored in S3
-    // For this demo, we'll serve a dummy file from the public folder or generate one
-
-    const filePath = path.join(process.cwd(), "public", "product.pdf");
-
-    // Create a dummy file if it doesn't exist
-    if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, "This is your digital product content.");
-    }
-
-    const fileBuffer = fs.readFileSync(filePath);
-
-    return new NextResponse(fileBuffer, {
-        headers: {
-            "Content-Type": "application/pdf",
-            "Content-Disposition": 'attachment; filename="Lumina-Wireless-Manual.pdf"',
-        },
-    });
 }
