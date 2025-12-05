@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ShoppingCart, Package, Settings, LogOut, Link as LinkIcon, Brain } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Package, LogOut, Link as LinkIcon, Brain, Users } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const navItems = [
     { href: "/admin/dashboard", label: "داشبورد", icon: LayoutDashboard },
     { href: "/admin/orders", label: "سفارش‌ها", icon: ShoppingCart },
+    { href: "/admin/users", label: "کاربران", icon: Users }, // اضافه کردن منوی کاربران
     { href: "/admin/product", label: "محصول", icon: Package },
     { href: "/admin/links", label: "انبار لینک‌ها", icon: LinkIcon },
-    { href: "/admin/settings", label: "تنظیمات", icon: Settings },
+    // منوی تنظیمات حذف شد
 ];
 
 export default function AdminSidebar() {

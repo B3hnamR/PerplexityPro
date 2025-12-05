@@ -8,37 +8,40 @@ export async function POST(req: Request) {
     try {
         const { mobile } = await req.json();
         
-        // اعتبارسنجی شماره موبایل
         if (!mobile || !/^09\d{9}$/.test(mobile)) {
             return NextResponse.json({ error: "شماره موبایل نامعتبر است" }, { status: 400 });
         }
 
-        // تولید کد ۵ رقمی
-        const code = Math.floor(10000 + Math.random() * 90000).toString();
-        const expiresAt = new Date(Date.now() + 2 * 60 * 1000); // ۲ دقیقه اعتبار
+        // بررسی اینکه آیا کاربر قبلاً ثبت‌نام کرده است؟
+        const existingUser = await prisma.user.findUnique({
+            where: { mobile }
+        });
 
-        // ذخیره کد در دیتابیس
+        const code = Math.floor(10000 + Math.random() * 90000).toString();
+        const expiresAt = new Date(Date.now() + 2 * 60 * 1000); 
+
         await prisma.oTP.upsert({
             where: { mobile },
             update: { code, expiresAt },
             create: { mobile, code, expiresAt },
         });
 
-        // تلاش برای ارسال پیامک
         const sent = await sendOTP(mobile, code);
 
         if (sent) {
-            return NextResponse.json({ success: true });
+            // ✅ برگرداندن وضعیت کاربر (آیا جدید است؟)
+            return NextResponse.json({ 
+                success: true, 
+                isNewUser: !existingUser // اگر کاربر پیدا نشد، یعنی جدید است
+            });
         } else {
-            // ✅ تغییر مهم: 
-            // اگر در محیط توسعه (Dev) هستیم، حتی اگر ارسال پیامک شکست خورد (مثلا قالب نبود)،
-            // چون کد در ترمینال چاپ شده، عملیات را موفق اعلام می‌کنیم تا بتوانید تست کنید.
             if (process.env.NODE_ENV !== "production") {
                 console.warn("⚠️ SMS Failed (Template Error?) but bypassed in DEV mode.");
-                return NextResponse.json({ success: true });
+                return NextResponse.json({ 
+                    success: true,
+                    isNewUser: !existingUser
+                });
             }
-            
-            // در محیط واقعی (Production) اگر پیامک نرود، خطا می‌دهیم
             return NextResponse.json({ error: "خطا در ارسال پیامک" }, { status: 500 });
         }
 

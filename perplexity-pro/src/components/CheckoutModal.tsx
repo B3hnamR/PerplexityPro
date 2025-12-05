@@ -9,29 +9,27 @@ interface CheckoutModalProps {
     isOpen: boolean;
     onClose: () => void;
     isCartCheckout?: boolean;
-    mode?: "CHECKOUT" | "LOGIN_ONLY"; // حالت عملیاتی مودال
+    mode?: "CHECKOUT" | "LOGIN_ONLY"; 
 }
 
 export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false, mode = "CHECKOUT" }: CheckoutModalProps) {
     const { data: session } = useSession();
     const { total } = useCart();
     
-    // Steps: 1=Mobile, 2=OTP, 3=RegisterInfo(If New), 4=ReadyToPay
     const [step, setStep] = useState(1);
     const [mobile, setMobile] = useState("");
     const [otp, setOtp] = useState("");
     const [userInfo, setUserInfo] = useState({ firstName: "", lastName: "", email: "" });
     const [loading, setLoading] = useState(false);
+    const [isNewUser, setIsNewUser] = useState(true); // وضعیت کاربر جدید
 
-    // ریست کردن وضعیت وقتی مودال باز می‌شود
     useEffect(() => {
         if (isOpen) {
             if (session) {
-                // اگر کاربر لاگین است
-                if (mode === "CHECKOUT") setStep(4); // برو برای پرداخت
-                else onClose(); // اگر فقط برای لاگین باز شده بود، ببندش
+                if (mode === "CHECKOUT") setStep(4);
+                else onClose();
             } else {
-                setStep(1); // از اول شروع کن
+                setStep(1);
             }
         }
     }, [isOpen, session, mode]);
@@ -48,7 +46,13 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
                 method: "POST",
                 body: JSON.stringify({ mobile })
             });
-            if (res.ok) setStep(2);
+            const data = await res.json();
+
+            if (res.ok) {
+                // ✅ ذخیره وضعیت کاربر (جدید یا قدیمی)
+                setIsNewUser(data.isNewUser);
+                setStep(2);
+            }
             else alert("خطا در ارسال پیامک");
         } catch (err) { alert("خطا در ارتباط"); }
         finally { setLoading(false); }
@@ -61,9 +65,10 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
         const res = await signIn("credentials", {
             mobile,
             code: otp,
-            firstName: userInfo.firstName,
-            lastName: userInfo.lastName,
-            email: userInfo.email,
+            // اگر کاربر جدید باشد اطلاعات را می‌فرستیم، اگر قدیمی باشد خالی می‌فرستیم
+            firstName: isNewUser ? userInfo.firstName : "",
+            lastName: isNewUser ? userInfo.lastName : "",
+            email: isNewUser ? userInfo.email : "",
             redirect: false,
         });
 
@@ -71,7 +76,6 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
         if (res?.error) {
             alert("کد وارد شده اشتباه است");
         } else {
-            // لاگین موفق
             if (mode === "LOGIN_ONLY") onClose();
             else setStep(4);
         }
@@ -85,7 +89,7 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     amount: isCartCheckout ? total : 398000,
-                    mobile: session?.user?.mobile || mobile, // موبایل از سشن
+                    mobile: session?.user?.mobile || mobile,
                     description: "خرید اشتراک",
                 }),
             });
@@ -105,7 +109,6 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
             <div className="relative w-full max-w-md bg-[#1e293b] border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
                 
-                {/* Header */}
                 <div className="flex items-center justify-between p-5 border-b border-white/5 bg-[#0f172a]/50">
                     <h3 className="text-lg font-bold text-white">
                         {step === 4 ? "تکمیل خرید" : "ورود / ثبت‌نام"}
@@ -114,7 +117,6 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
                 </div>
 
                 <div className="p-6">
-                    {/* Step 1: Mobile */}
                     {step === 1 && (
                         <form onSubmit={handleSendOtp} className="space-y-5">
                             <p className="text-gray-300 text-sm">برای شروع، شماره موبایل خود را وارد کنید:</p>
@@ -122,23 +124,19 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
                                 <input 
                                     type="tel" value={mobile} onChange={e => setMobile(e.target.value)}
                                     className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-white text-center text-xl tracking-widest placeholder-gray-600 focus:border-cyan-500 focus:outline-none transition-colors dir-ltr"
-                                    placeholder="0912..." autoFocus
-                                    dir="ltr" // ✅ چپ‌چین شدن تضمینی شماره
+                                    placeholder="0912..." autoFocus dir="ltr"
                                 />
                                 <Smartphone className="absolute left-3 top-3.5 text-gray-500" size={20} />
                             </div>
                             <button disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2">
                                 {loading ? <Loader2 className="animate-spin" /> : "ارسال کد تایید"}
                             </button>
-                            
-                            {/* لینک ورود مدیران */}
                             <div className="text-center pt-2">
                                 <a href="/auth/login" className="text-xs text-gray-500 hover:text-cyan-400 transition-colors">ورود مدیران</a>
                             </div>
                         </form>
                     )}
 
-                    {/* Step 2: OTP & Register Info */}
                     {step === 2 && (
                         <form onSubmit={handleVerify} className="space-y-5">
                             <div className="text-center mb-4">
@@ -152,18 +150,20 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
                                 maxLength={5} autoFocus
                             />
 
-                            {/* فیلدهای ثبت نام (نام و ایمیل) */}
-                            <div className="bg-[#0f172a]/50 p-4 rounded-xl border border-white/5 space-y-3">
-                                <p className="text-xs text-gray-400 font-bold">اطلاعات تکمیلی (برای ثبت‌نام):</p>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <input placeholder="نام" className="bg-[#1e293b] border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none"
-                                        onChange={e => setUserInfo({...userInfo, firstName: e.target.value})} required />
-                                    <input placeholder="نام خانوادگی" className="bg-[#1e293b] border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none"
-                                        onChange={e => setUserInfo({...userInfo, lastName: e.target.value})} required />
+                            {/* ✅ فقط اگر کاربر جدید باشد این بخش نمایش داده می‌شود */}
+                            {isNewUser && (
+                                <div className="bg-[#0f172a]/50 p-4 rounded-xl border border-white/5 space-y-3 animate-fade-in">
+                                    <p className="text-xs text-gray-400 font-bold">تکمیل اطلاعات (اختیاری):</p>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <input placeholder="نام" className="bg-[#1e293b] border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none"
+                                            onChange={e => setUserInfo({...userInfo, firstName: e.target.value})} />
+                                        <input placeholder="نام خانوادگی" className="bg-[#1e293b] border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none"
+                                            onChange={e => setUserInfo({...userInfo, lastName: e.target.value})} />
+                                    </div>
+                                    <input type="email" placeholder="ایمیل (اختیاری)" className="w-full bg-[#1e293b] border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none dir-ltr text-left"
+                                        onChange={e => setUserInfo({...userInfo, email: e.target.value})} />
                                 </div>
-                                <input type="email" placeholder="ایمیل (اختیاری)" className="w-full bg-[#1e293b] border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500 focus:outline-none dir-ltr text-left"
-                                    onChange={e => setUserInfo({...userInfo, email: e.target.value})} />
-                            </div>
+                            )}
 
                             <button disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2">
                                 {loading ? <Loader2 className="animate-spin" /> : "تایید و ادامه"}
@@ -171,7 +171,6 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
                         </form>
                     )}
 
-                    {/* Step 4: Payment Confirm */}
                     {step === 4 && (
                         <div className="text-center space-y-6">
                             <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto">

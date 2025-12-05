@@ -16,7 +16,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "اطلاعات نامعتبر", details: validation.error.format() }, { status: 400 });
         }
 
-        const { amount, description, email, mobile, customData, quantity } = validation.data;
+        const { amount, description, email, mobile, quantity } = validation.data;
         const qty = quantity || 1;
 
         // پیدا کردن کاربر
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         const callbackUrl = `${baseUrl}/api/payment/verify`;
 
         const result = await prisma.$transaction(async (tx) => {
-            // 1. بررسی موجودی (بدون خطا دادن در صورت کمبود)
+            // 1. تلاش برای رزرو لینک
             const availableLinks = await tx.downloadLink.findMany({
                 where: { status: "AVAILABLE" },
                 take: qty,
@@ -38,20 +38,15 @@ export async function POST(req: Request) {
 
             let linkIds: string[] = [];
             
-            // ✅ فقط اگر موجودی کافی بود رزرو انجام بده
             if (availableLinks.length >= qty) {
                 linkIds = availableLinks.map(l => l.id);
-                
-                // رزرو لینک‌ها
                 await tx.downloadLink.updateMany({
                     where: { id: { in: linkIds } },
                     data: { status: "RESERVED" }
                 });
-            } 
-            // در غیر این صورت (موجودی کم یا صفر)، هیچ لینکی رزرو نمی‌شود و linkIds خالی می‌ماند
-            // و سفارش به صورت "تحویل دستی" پردازش خواهد شد.
+            }
 
-            // 2. درخواست به زرین‌پال
+            // 2. درخواست پرداخت
             const payment = await requestPayment(amount, description, callbackUrl, email || undefined, mobile);
             
             if (!payment.data || payment.data.code !== 100) {
@@ -60,7 +55,7 @@ export async function POST(req: Request) {
 
             const trackingCode = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
             
-            // 3. ایجاد سفارش
+            // 3. ایجاد سفارش (بدون customData و فیلدهای اضافی)
             const order = await tx.order.create({
                 data: {
                     amount,
@@ -70,9 +65,7 @@ export async function POST(req: Request) {
                     userId: userId,
                     refId: payment.data.authority,
                     trackingCode,
-                    customData: customData ? JSON.stringify(customData) : null,
                     status: "PENDING",
-                    // اگر لینکی رزرو شده بود وصل کن، اگر نه هیچی (که یعنی تحویل دستی)
                     links: linkIds.length > 0 ? {
                         connect: linkIds.map(id => ({ id }))
                     } : undefined
@@ -86,7 +79,6 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error("Payment Request Error:", error);
-        // خطای درگاه را جداگانه هندل می‌کنیم، اما خطای موجودی دیگر نداریم
         return NextResponse.json({ error: "خطا در ارتباط با درگاه پرداخت" }, { status: 500 });
     }
 }
