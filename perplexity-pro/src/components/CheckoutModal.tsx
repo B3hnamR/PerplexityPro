@@ -9,7 +9,7 @@ interface CheckoutModalProps {
     isOpen: boolean;
     onClose: () => void;
     isCartCheckout?: boolean;
-    mode?: "CHECKOUT" | "LOGIN_ONLY"; 
+    mode?: "CHECKOUT" | "LOGIN_ONLY";
 }
 
 export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false, mode = "CHECKOUT" }: CheckoutModalProps) {
@@ -21,7 +21,7 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
     const [otp, setOtp] = useState("");
     const [userInfo, setUserInfo] = useState({ firstName: "", lastName: "", email: "" });
     const [loading, setLoading] = useState(false);
-    const [isNewUser, setIsNewUser] = useState(true); // وضعیت کاربر جدید
+    const [isNewUser, setIsNewUser] = useState(true);
 
     useEffect(() => {
         if (isOpen) {
@@ -49,7 +49,6 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
             const data = await res.json();
 
             if (res.ok) {
-                // ✅ ذخیره وضعیت کاربر (جدید یا قدیمی)
                 setIsNewUser(data.isNewUser);
                 setStep(2);
             }
@@ -65,7 +64,6 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
         const res = await signIn("credentials", {
             mobile,
             code: otp,
-            // اگر کاربر جدید باشد اطلاعات را می‌فرستیم، اگر قدیمی باشد خالی می‌فرستیم
             firstName: isNewUser ? userInfo.firstName : "",
             lastName: isNewUser ? userInfo.lastName : "",
             email: isNewUser ? userInfo.email : "",
@@ -131,9 +129,6 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
                             <button disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2">
                                 {loading ? <Loader2 className="animate-spin" /> : "ارسال کد تایید"}
                             </button>
-                            <div className="text-center pt-2">
-                                <a href="/auth/login" className="text-xs text-gray-500 hover:text-cyan-400 transition-colors">ورود مدیران</a>
-                            </div>
                         </form>
                     )}
 
@@ -150,7 +145,6 @@ export default function CheckoutModal({ isOpen, onClose, isCartCheckout = false,
                                 maxLength={5} autoFocus
                             />
 
-                            {/* ✅ فقط اگر کاربر جدید باشد این بخش نمایش داده می‌شود */}
                             {isNewUser && (
                                 <div className="bg-[#0f172a]/50 p-4 rounded-xl border border-white/5 space-y-3 animate-fade-in">
                                     <p className="text-xs text-gray-400 font-bold">تکمیل اطلاعات (اختیاری):</p>
