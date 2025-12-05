@@ -1,14 +1,8 @@
-const SMSIR_API_KEY = process.env.SMSIR_API_KEY || "";
-// شناسه قالب را از پنل sms.ir بگیرید (مثلاً قالبی با متن: کد تایید شما: {{code}})
-const VERIFY_TEMPLATE_ID = Number(process.env.SMSIR_VERIFY_TEMPLATE_ID || 100000);
+// کلید API شما (بهتر است در فایل .env هم قرار دهید، اما اینجا به عنوان پیش‌فرض گذاشتم)
+const SMSIR_API_KEY = process.env.SMSIR_API_KEY || "vbMPwuG9HBURZdD6xBlZDB8FgyMtqMyV4fgSKJeBmXbwZAfp";
+const VERIFY_TEMPLATE_ID = Number(process.env.SMSIR_VERIFY_TEMPLATE_ID || 100000); // شناسه قالب پیش‌فرض
 
 export async function sendOTP(mobile: string, code: string) {
-    // در محیط توسعه، اگر کلید API نباشد، فقط لاگ می‌گیریم
-    if (!SMSIR_API_KEY) {
-        console.log("DEV MODE - SMS OTP:", { mobile, code });
-        return true;
-    }
-
     try {
         const response = await fetch("https://api.sms.ir/v1/send/verify", {
             method: "POST",
@@ -26,10 +20,23 @@ export async function sendOTP(mobile: string, code: string) {
         });
         
         const data = await response.json();
-        // status=1 در sms.ir یعنی موفق
         return data.status === 1;
     } catch (error) {
         console.error("SMS Send Error:", error);
         return false;
     }
+}
+
+export async function sendOrderNotification(mobile: string, trackingCode: string) {
+    // برای ارسال پیامک اطلاع‌رسانی (مثل تحویل دستی)
+    // نیاز به یک قالب جداگانه در sms.ir دارید (مثلاً با شناسه دیگر)
+    // فعلاً از همان متد verify استفاده می‌کنیم یا می‌توانید از متد bulk استفاده کنید
+    // این یک نمونه ساده با فرض وجود قالب است:
+    /*
+    return await fetch("https://api.sms.ir/v1/send/verify", {
+        // ... تنظیمات مربوط به قالب اطلاع‌رسانی
+    });
+    */
+    console.log(`SMS Notification to ${mobile}: Order ${trackingCode} is ready.`);
+    return true;
 }

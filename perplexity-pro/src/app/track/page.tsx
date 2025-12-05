@@ -1,129 +1,155 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { Search, Package, Clock, CheckCircle, XCircle, ArrowRight } from "lucide-react";
+import { Search, Lock, ArrowRight, Smartphone, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import DeliveryClient from "../delivery/[token]/DeliveryClient"; // استفاده مجدد از کامپوننت نمایش
 
 export default function TrackOrderPage() {
-    const [code, setCode] = useState("");
-    const [order, setOrder] = useState<any>(null);
+    const [step, setStep] = useState(1); // 1: Code, 2: OTP, 3: Result
+    const [trackingCode, setTrackingCode] = useState("");
+    const [mobileMasked, setMobileMasked] = useState("");
+    const [otp, setOtp] = useState("");
+    const [orderData, setOrderData] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const handleTrack = async (e: React.FormEvent) => {
+    // مرحله ۱: دریافت کد پیگیری و ارسال OTP
+    const handleRequestOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError("");
-        setOrder(null);
 
         try {
-            const res = await fetch(`/api/orders/track?code=${code}`);
+            const res = await fetch("/api/orders/track/send-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ trackingCode })
+            });
             const data = await res.json();
 
             if (res.ok) {
-                setOrder(data);
+                setMobileMasked(data.mobile);
+                setStep(2);
             } else {
-                setError(data.error || "سفارشی با این کد رهگیری یافت نشد.");
+                setError(data.error || "سفارش یافت نشد");
             }
-        } catch (err) {
-            setError("مشکلی در برقراری ارتباط پیش آمد.");
-        } finally {
-            setLoading(false);
-        }
+        } catch (err) { setError("خطا در ارتباط"); }
+        finally { setLoading(false); }
     };
 
-    const getStatusInfo = (status: string) => {
-        switch (status) {
-            case "PAID":
-                return { label: "پرداخت شده", icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" };
-            case "PENDING":
-                return { label: "در انتظار پرداخت", icon: Clock, color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" };
-            case "FAILED":
-                return { label: "ناموفق", icon: XCircle, color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" };
-            default:
-                return { label: status, icon: Package, color: "text-gray-400", bg: "bg-gray-500/10 border-gray-500/20" };
-        }
+    // مرحله ۲: تایید OTP و نمایش سفارش
+    const handleVerifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
+
+        try {
+            const res = await fetch("/api/orders/track/verify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ trackingCode, otp })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                setOrderData(data);
+                setStep(3);
+            } else {
+                setError(data.error || "کد تایید اشتباه است");
+            }
+        } catch (err) { setError("خطا در ارتباط"); }
+        finally { setLoading(false); }
     };
 
     return (
         <main className="min-h-screen bg-[#0f172a] font-sans text-white">
             <Navbar onPreOrder={() => { }} />
             
-            <div className="pt-32 pb-20 max-w-2xl mx-auto px-4">
+            <div className="pt-32 pb-20 max-w-xl mx-auto px-4">
                 <div className="text-center mb-10">
-                    <h1 className="text-3xl md:text-4xl font-black mb-4">پیگیری سفارش</h1>
-                    <p className="text-gray-400">
-                        کد رهگیری سفارش خود را وارد کنید تا از وضعیت آن مطلع شوید.
-                    </p>
+                    <h1 className="text-3xl font-black mb-4">پیگیری امن سفارش</h1>
+                    <p className="text-gray-400">برای مشاهده جزئیات و دریافت لینک‌ها، کد پیگیری را وارد کنید.</p>
                 </div>
 
-                <div className="bg-[#1e293b] border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl">
-                    <form onSubmit={handleTrack} className="relative mb-8">
-                        <input
-                            type="text"
-                            placeholder="کد رهگیری (مثلاً ORD-123456)"
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            className="w-full bg-[#0f172a] border border-white/10 rounded-xl py-4 px-5 pl-32 text-white focus:outline-none focus:border-cyan-500 transition-all text-lg placeholder-gray-600"
-                            required
-                        />
-                        <button 
-                            type="submit" 
-                            disabled={loading}
-                            className="absolute left-2 top-2 bottom-2 bg-cyan-500 hover:bg-cyan-400 text-white px-6 rounded-lg font-bold flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                        >
-                            {loading ? "..." : <><Search size={18} /> پیگیری</>}
-                        </button>
-                    </form>
+                <div className="bg-[#1e293b] border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                    {step === 1 && (
+                        <form onSubmit={handleRequestOtp} className="space-y-6">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="کد پیگیری (مثلاً ORD-123456)"
+                                    value={trackingCode}
+                                    onChange={(e) => setTrackingCode(e.target.value)}
+                                    className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-4 text-white text-center text-lg tracking-wider focus:border-cyan-500 focus:outline-none transition-colors uppercase"
+                                    required
+                                />
+                                <Search className="absolute left-4 top-4.5 text-gray-500" size={20} />
+                            </div>
+                            <button disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-4 rounded-xl font-bold flex justify-center items-center gap-2 transition-all">
+                                {loading ? <Loader2 className="animate-spin" /> : "ادامه و تایید هویت"}
+                            </button>
+                        </form>
+                    )}
 
-                    {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-center mb-6">
-                            {error}
+                    {step === 2 && (
+                        <form onSubmit={handleVerifyOtp} className="space-y-6 animate-fade-in">
+                            <div className="text-center bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4">
+                                <p className="text-sm text-cyan-300 mb-1">کد تایید به شماره زیر ارسال شد:</p>
+                                <p className="text-lg font-bold font-mono text-white">{mobileMasked}</p>
+                            </div>
+                            
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="کد ۵ رقمی"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                    className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] focus:border-cyan-500 focus:outline-none transition-colors"
+                                    maxLength={5}
+                                    required
+                                    autoFocus
+                                />
+                                <Lock className="absolute left-4 top-5 text-gray-500" size={20} />
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button type="button" onClick={() => setStep(1)} className="px-4 rounded-xl border border-white/10 hover:bg-white/5 text-gray-400">
+                                    <ArrowRight />
+                                </button>
+                                <button disabled={loading} className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-xl font-bold flex justify-center items-center gap-2 transition-all">
+                                    {loading ? <Loader2 className="animate-spin" /> : "مشاهده سفارش"}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {step === 3 && orderData && (
+                        <div className="animate-fade-in space-y-6">
+                            <div className="bg-[#0f172a] p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                                <span className="text-gray-400">وضعیت:</span>
+                                <span className="text-emerald-400 font-bold">پرداخت شده</span>
+                            </div>
+
+                            {/* نمایش لینک‌ها با کامپوننت آماده */}
+                            {orderData.links && orderData.links.length > 0 ? (
+                                <DeliveryClient links={orderData.links} />
+                            ) : (
+                                <div className="text-center text-yellow-400 p-4 bg-yellow-500/10 rounded-xl border border-yellow-500/20">
+                                    لینک دانلود هنوز صادر نشده است.
+                                </div>
+                            )}
+
+                            <button onClick={() => window.location.reload()} className="w-full mt-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-gray-400 transition-colors">
+                                جستجوی جدید
+                            </button>
                         </div>
                     )}
 
-                    {order && (
-                        <div className="animate-fade-in-up">
-                            {(() => {
-                                const info = getStatusInfo(order.status);
-                                const Icon = info.icon;
-                                return (
-                                    <div className={`p-6 rounded-2xl border ${info.bg} flex flex-col items-center text-center mb-6`}>
-                                        <Icon size={48} className={`mb-3 ${info.color}`} />
-                                        <h3 className={`text-xl font-bold ${info.color}`}>{info.label}</h3>
-                                        {order.status === "PAID" && (
-                                            <p className="text-sm text-gray-400 mt-1">سفارش شما با موفقیت تکمیل شده است.</p>
-                                        )}
-                                    </div>
-                                );
-                            })()}
-
-                            <div className="bg-[#0f172a] rounded-xl border border-white/5 p-5 space-y-4">
-                                <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                                    <span className="text-gray-400">کد پیگیری</span>
-                                    <span className="font-mono font-bold text-white">{order.trackingCode}</span>
-                                </div>
-                                <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                                    <span className="text-gray-400">مبلغ</span>
-                                    <span className="font-bold text-cyan-400">{order.amount.toLocaleString()} تومان</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-gray-400">تاریخ ثبت</span>
-                                    <span className="text-white dir-ltr">
-                                        {new Date(order.createdAt).toLocaleDateString("fa-IR")}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {order.status === "PAID" && order.downloadToken && (
-                                <Link 
-                                    href={`/delivery/${order.downloadToken}`}
-                                    className="mt-6 w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-900/20"
-                                >
-                                    مشاهده لینک‌های دانلود <ArrowRight size={20} />
-                                </Link>
-                            )}
+                    {error && (
+                        <div className="mt-6 bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-center animate-pulse">
+                            {error}
                         </div>
                     )}
                 </div>
