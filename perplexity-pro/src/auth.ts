@@ -11,52 +11,64 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             id: "credentials",
             name: "Credentials",
             credentials: {
-                email: { label: "Email", type: "text" }, // For Admin
-                password: { label: "Password", type: "password" }, // For Admin
-                mobile: { label: "Mobile", type: "text" }, // For User
-                code: { label: "Code", type: "text" }, // For User
-                firstName: { label: "First Name", type: "text" }, // For Registration
-                lastName: { label: "Last Name", type: "text" }, // For Registration
+                // فیلدهای ترکیبی برای هر دو نوع لاگین
+                email: { label: "Email", type: "text" },
+                password: { label: "Password", type: "password" },
+                mobile: { label: "Mobile", type: "text" },
+                code: { label: "Code", type: "text" },
+                firstName: { label: "Name", type: "text" },
+                lastName: { label: "Family", type: "text" },
             },
             authorize: async (credentials) => {
-                // 1. ورود ادمین (با ایمیل و پسورد)
+                // --- روش ۱: ورود ادمین ---
                 if (credentials?.email && credentials?.password) {
                     const admin = await prisma.admin.findUnique({
                         where: { email: credentials.email as string },
                     });
                     if (admin && await bcrypt.compare(credentials.password as string, admin.password)) {
-                        return { id: admin.id, email: admin.email, name: admin.name, role: "ADMIN" };
+                        return { 
+                            id: admin.id, 
+                            email: admin.email, 
+                            name: admin.name, 
+                            role: "ADMIN" 
+                        };
                     }
                 }
 
-                // 2. ورود/عضویت کاربر (با موبایل و کد)
+                // --- روش ۲: ورود/عضویت کاربر ---
                 if (credentials?.mobile && credentials?.code) {
                     const mobile = credentials.mobile as string;
                     const code = credentials.code as string;
 
-                    // بررسی کد OTP
+                    // بررسی صحت کد OTP
                     const otpRecord = await prisma.oTP.findUnique({ where: { mobile } });
                     
                     if (!otpRecord || otpRecord.code !== code || otpRecord.expiresAt < new Date()) {
                         throw new Error("کد تایید نامعتبر یا منقضی شده است");
                     }
 
-                    // حذف کد پس از استفاده
+                    // حذف کد استفاده شده
                     await prisma.oTP.delete({ where: { mobile } });
 
-                    // پیدا کردن یا ساختن کاربر
+                    // ثبت نام یا ورود کاربر
+                    // اگر کاربر جدید باشد، اطلاعات نام و نام خانوادگی ذخیره می‌شود
                     const user = await prisma.user.upsert({
                         where: { mobile },
-                        update: {}, // اگر بود، آپدیت نکن
+                        update: {}, 
                         create: {
                             mobile,
                             firstName: (credentials.firstName as string) || null,
                             lastName: (credentials.lastName as string) || null,
-                            email: (credentials.email as string) || null, // ایمیل کاربر اختیاری است
+                            email: (credentials.email as string) || null,
                         }
                     });
 
-                    return { id: user.id, mobile: user.mobile, name: `${user.firstName || ''} ${user.lastName || ''}`.trim(), role: "USER" };
+                    return { 
+                        id: user.id, 
+                        mobile: user.mobile, 
+                        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || "کاربر", 
+                        role: "USER" 
+                    };
                 }
 
                 return null;
@@ -78,7 +90,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (user) {
                 token.sub = user.id;
                 // @ts-ignore
-                token.role = user.role;
+                token.role = user.role || "USER";
                 // @ts-ignore
                 token.mobile = user.mobile;
             }
@@ -86,5 +98,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
     },
     session: { strategy: "jwt" },
-    pages: { signIn: "/auth/login" }, // صفحه لاگین مشترک (بعدا می‌سازیم)
+    pages: { 
+        signIn: "/auth/login", // صفحه لاگین پیش‌فرض (برای ادمین)
+    },
 });

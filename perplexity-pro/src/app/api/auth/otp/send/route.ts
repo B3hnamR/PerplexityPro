@@ -6,14 +6,14 @@ export async function POST(req: Request) {
     try {
         const { mobile } = await req.json();
         
-        // اعتبارسنجی ساده موبایل
+        // اعتبارسنجی شماره موبایل ایران
         if (!mobile || !/^09\d{9}$/.test(mobile)) {
-            return NextResponse.json({ error: "شماره موبایل نامعتبر است" }, { status: 400 });
+            return NextResponse.json({ error: "شماره موبایل معتبر نیست" }, { status: 400 });
         }
 
-        // تولید کد ۵ رقمی
+        // تولید کد ۵ رقمی تصادفی
         const code = Math.floor(10000 + Math.random() * 90000).toString();
-        const expiresAt = new Date(Date.now() + 2 * 60 * 1000); // ۲ دقیقه اعتبار
+        const expiresAt = new Date(Date.now() + 2 * 60 * 1000); // اعتبار: ۲ دقیقه
 
         // ذخیره یا آپدیت کد در دیتابیس
         await prisma.oTP.upsert({
@@ -28,14 +28,15 @@ export async function POST(req: Request) {
         if (sent) {
             return NextResponse.json({ success: true });
         } else {
-            // برای حالت توسعه اگر API Key ست نباشد، موفق در نظر می‌گیریم (کد در کنسول لاگ می‌شود)
-            if (process.env.NODE_ENV === "development") {
+            // فال‌بک برای دولوپ: اگر API ست نشده بود، کد را در ریسپانس بفرست (فقط برای تست)
+            if (process.env.NODE_ENV !== "production" && !process.env.SMSIR_API_KEY) {
                 return NextResponse.json({ success: true, devCode: code });
             }
             return NextResponse.json({ error: "خطا در ارسال پیامک" }, { status: 500 });
         }
 
     } catch (error) {
+        console.error("OTP Error:", error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

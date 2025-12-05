@@ -1,12 +1,11 @@
 const SMSIR_API_KEY = process.env.SMSIR_API_KEY || "";
-const SMSIR_LINE_NUMBER = process.env.SMSIR_LINE_NUMBER || "";
-// شناسه قالب‌های پیامک را از داکیومنت sms.ir یا پنل خود بگیرید و در env بگذارید
-// مثال: verify_template_id=100000
-const VERIFY_TEMPLATE_ID = Number(process.env.SMSIR_VERIFY_TEMPLATE_ID || 0);
+// شناسه قالب را از پنل sms.ir بگیرید (مثلاً قالبی با متن: کد تایید شما: {{code}})
+const VERIFY_TEMPLATE_ID = Number(process.env.SMSIR_VERIFY_TEMPLATE_ID || 100000);
 
 export async function sendOTP(mobile: string, code: string) {
+    // در محیط توسعه، اگر کلید API نباشد، فقط لاگ می‌گیریم
     if (!SMSIR_API_KEY) {
-        console.log("SMS Simulator:", mobile, code); // برای تست روی لوکال
+        console.log("DEV MODE - SMS OTP:", { mobile, code });
         return true;
     }
 
@@ -27,16 +26,10 @@ export async function sendOTP(mobile: string, code: string) {
         });
         
         const data = await response.json();
+        // status=1 در sms.ir یعنی موفق
         return data.status === 1;
     } catch (error) {
         console.error("SMS Send Error:", error);
         return false;
     }
-}
-
-export async function sendOrderNotification(mobile: string, trackingCode: string) {
-    // پیاده‌سازی مشابه برای اطلاع‌رسانی سفارش
-    // نیاز به یک Template ID دیگر در پنل sms.ir دارید
-    console.log("Order SMS:", mobile, trackingCode);
-    return true; 
 }

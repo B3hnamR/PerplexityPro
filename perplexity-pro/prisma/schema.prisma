@@ -53,9 +53,9 @@ model Order {
   trackingCode  String?  @unique
   amount        Float
   quantity      Int      @default(1)
-  status        String   @default("PENDING") // PENDING, PAID, FAILED
+  status        String   @default("PENDING")
   
-  // اتصال به کاربر (اختیاری برای سازگاری با سفارشات قدیمی، اما در سیستم جدید اجباری می‌شود)
+  // اتصال به کاربر (اجباری در سیستم جدید)
   userId        String?
   user          User?    @relation(fields: [userId], references: [id])
   
