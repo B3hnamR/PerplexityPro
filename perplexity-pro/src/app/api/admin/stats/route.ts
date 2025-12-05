@@ -17,14 +17,18 @@ export async function GET() {
         });
 
         const orderCount = await prisma.order.count();
-
-        // Mock visitor count or fetch from analytics if available
+        const pendingOrders = await prisma.order.count({ where: { status: "PENDING" } });
+        const availableStock = await prisma.downloadLink.count({ where: { status: "AVAILABLE" } });
+        
+        // آمار بازدید را فعلا ثابت می‌فرستیم یا از جدول دیگری می‌خوانیم
         const visitorCount = 1200;
 
         return NextResponse.json({
             totalSales: totalSales._sum.amount || 0,
             orderCount,
             visitorCount,
+            pendingOrders,
+            availableStock
         });
     } catch (error) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

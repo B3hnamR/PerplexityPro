@@ -8,18 +8,18 @@ export async function GET(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
-    try {
-        const session = await auth();
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+    const session = await auth();
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
+    try {
         const { id } = await params;
 
         const order = await prisma.order.findUnique({
             where: { id },
             include: {
-                links: true, // دریافت لینک‌های تخصیص داده شده
+                links: true,
             },
         });
 
@@ -27,7 +27,6 @@ export async function GET(
             return NextResponse.json({ error: "Order not found" }, { status: 404 });
         }
 
-        // تبدیل داده به فرمت مورد انتظار کلاینت
         const formattedOrder = {
             ...order,
             items: [

@@ -1,6 +1,6 @@
 export const zarinpalConfig = {
-    merchantId: process.env.ZARINPAL_MERCHANT_ID || "41560e45-4217-437d-90fe-270293791227", // Sandbox default
-    sandbox: true,
+    merchantId: process.env.ZARINPAL_MERCHANT_ID || "41560e45-4217-437d-90fe-270293791227",
+    sandbox: process.env.ZARINPAL_SANDBOX === "true", // ✅ خواندن از Env
 };
 
 export async function requestPayment(amount: number, description: string, callbackUrl: string, email?: string, mobile?: string) {
@@ -20,8 +20,8 @@ export async function requestPayment(amount: number, description: string, callba
             description,
             callback_url: callbackUrl,
             metadata: {
-                email,
-                mobile,
+                email: email || undefined,
+                mobile: mobile || undefined,
             },
         }),
     });

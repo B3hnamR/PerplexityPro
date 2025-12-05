@@ -2,49 +2,46 @@ import { NextResponse } from "next/server";
 import { requestPayment, getPaymentUrl } from "@/lib/zarinpal";
 import { prisma } from "@/lib/db";
 import { paymentSchema } from "@/lib/validations";
-import { rateLimit } from "@/lib/rate-limit";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
     try {
-        const ip = req.headers.get("x-forwarded-for") || "unknown";
-        if (!rateLimit(ip, 5, 60000)) { // 5 requests per minute
-            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-        }
-
         const body = await req.json();
 
-        // Validate input
+        // اعتبارسنجی ورودی
         const validation = paymentSchema.safeParse(body);
         if (!validation.success) {
-            return NextResponse.json({ error: "Validation Error", details: validation.error.format() }, { status: 400 });
+            return NextResponse.json({ error: "اطلاعات وارد شده معتبر نیست", details: validation.error.format() }, { status: 400 });
         }
 
-        const { amount, description, email, mobile, customData, quantity = 1 } = validation.data;
+        const { amount, description, email, mobile, customData, quantity } = validation.data;
+        const qty = quantity || 1;
 
-        // Validate required custom fields from DB
-        const requiredFields = await prisma.customField.findMany({ where: { required: true } });
-        for (const field of requiredFields) {
-            const val = (customData as Record<string, string> | undefined)?.[field.name];
-            if (!val || String(val).trim() === "") {
-                return NextResponse.json({ error: `لطفاً فیلد الزامی ${field.label} را تکمیل کنید` }, { status: 400 });
-            }
+        // ✅ 1. چک کردن موجودی انبار (مهم)
+        const availableStock = await prisma.downloadLink.count({
+            where: { status: "AVAILABLE" }
+        });
+
+        if (availableStock < qty) {
+            return NextResponse.json({ error: "متاسفانه موجودی انبار کافی نیست." }, { status: 400 });
         }
 
-        // Hardcoded callback URL for local development
-        const callbackUrl = "http://localhost:3000/api/payment/verify";
+        // ✅ 2. استفاده از متغیر محیطی برای آدرس بازگشت
+        const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+        const callbackUrl = `${baseUrl}/api/payment/verify`;
 
-        const response = await requestPayment(amount, description, callbackUrl, email, mobile);
+        // درخواست به زرین‌پال
+        const response = await requestPayment(amount, description, callbackUrl, email || undefined, mobile);
 
         if (response.data && response.data.code === 100) {
-            // Generate short tracking code
             const trackingCode = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
 
-            // Save pending order to DB
             await prisma.order.create({
                 data: {
                     amount,
-                    quantity,
-                    customerEmail: email,
+                    quantity: qty,
+                    customerEmail: email || "", // ذخیره رشته خالی اگر ایمیل نبود
                     customerPhone: mobile,
                     refId: response.data.authority,
                     trackingCode,
@@ -58,10 +55,10 @@ export async function POST(req: Request) {
                 authority: response.data.authority,
             });
         } else {
-            return NextResponse.json({ error: "Payment request failed", details: response }, { status: 400 });
+            return NextResponse.json({ error: "خطا در اتصال به درگاه بانکی", details: response }, { status: 400 });
         }
     } catch (error) {
-        console.error(error);
+        console.error("Payment Request Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

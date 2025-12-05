@@ -5,19 +5,19 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-    try {
-        const session = await auth();
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+    const session = await auth();
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
+    try {
         const orders = await prisma.order.findMany({
             orderBy: {
                 createdAt: "desc",
             },
             take: 100,
             include: {
-                links: true, // ✅ این خط بسیار مهم است
+                links: true,
             }
         });
 

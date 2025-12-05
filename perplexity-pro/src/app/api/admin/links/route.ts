@@ -5,23 +5,21 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-    try {
-        const session = await auth();
-        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await auth();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    try {
         const { searchParams } = new URL(req.url);
-        const status = searchParams.get("status") || "AVAILABLE"; // 'AVAILABLE' | 'USED'
+        const status = searchParams.get("status") || "AVAILABLE"; 
         const page = parseInt(searchParams.get("page") || "1");
         const limit = parseInt(searchParams.get("limit") || "10");
         const skip = (page - 1) * limit;
 
-        // دریافت آمار کلی
         const [availableCount, usedCount] = await Promise.all([
             prisma.downloadLink.count({ where: { status: "AVAILABLE" } }),
             prisma.downloadLink.count({ where: { status: "USED" } })
         ]);
 
-        // دریافت لینک‌ها با صفحه‌بندی
         const links = await prisma.downloadLink.findMany({
             where: { status: status },
             orderBy: { createdAt: "desc" },
@@ -53,18 +51,17 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    try {
-        const session = await auth();
-        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await auth();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    try {
         const body = await req.json();
-        const { links } = body; // Expecting array of strings
+        const { links } = body; 
 
         if (!links || !Array.isArray(links) || links.length === 0) {
             return NextResponse.json({ error: "Invalid data" }, { status: 400 });
         }
 
-        // ایجاد چندین رکورد همزمان
         await prisma.downloadLink.createMany({
             data: links.map((url: string) => ({
                 url: url.trim(),
@@ -79,13 +76,12 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-    try {
-        const session = await auth();
-        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await auth();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    try {
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
-
         if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
         await prisma.downloadLink.delete({ where: { id } });
