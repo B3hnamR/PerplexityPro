@@ -12,12 +12,13 @@ export async function GET(req: Request) {
 
     try {
         const orders = await prisma.order.findMany({
-            orderBy: {
-                createdAt: "desc",
-            },
+            orderBy: { createdAt: "desc" },
             take: 100,
             include: {
                 links: true,
+                user: { // ✅ اضافه کردن اطلاعات کاربر
+                    select: { firstName: true, lastName: true, email: true, mobile: true }
+                }
             }
         });
 
