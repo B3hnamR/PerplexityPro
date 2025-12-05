@@ -15,7 +15,10 @@ export async function GET(req: Request) {
             orderBy: {
                 createdAt: "desc",
             },
-            take: 100, 
+            take: 100,
+            include: {
+                links: true, // ✅ این خط بسیار مهم است
+            }
         });
 
         return NextResponse.json(orders);
