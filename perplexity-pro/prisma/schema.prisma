@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql" // یا sqlite اگر هنوز روی آن هستید
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -22,7 +22,7 @@ model User {
   lastName  String?
   mobile    String   @unique
   email     String?
-  role      String   @default("USER")
+  role      String   @default("USER") // USER, ADMIN
   orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -51,7 +51,8 @@ model Order {
   id            String   @id @default(cuid())
   refId         String?  @unique
   trackingCode  String?  @unique
-  amount        Float
+  amount        Float    // مبلغ نهایی پرداخت شده
+  originalAmount Float?  // مبلغ قبل از تخفیف
   quantity      Int      @default(1)
   status        String   @default("PENDING")
   
@@ -65,15 +66,37 @@ model Order {
   downloadCount Int      @default(0)
   customData    String?  @db.Text
   
+  // ارتباط با کد تخفیف
+  discountCodeId String?
+  discountCode   DiscountCode? @relation(fields: [discountCodeId], references: [id])
+  
   links         DownloadLink[]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
   @@index([userId])
+  @@index([discountCodeId])
 }
 
-// مدل CustomField حذف شد
+model DiscountCode {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  type        String   // "PERCENTAGE" or "FIXED"
+  value       Float
+  
+  minOrderPrice Float?
+  maxDiscount   Float?
+  maxUses       Int?
+  usedCount     Int      @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean  @default(true)
+  
+  orders        Order[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
 model DownloadLink {
   id         String   @id @default(cuid())

@@ -10,10 +10,10 @@ export async function GET(req: Request) {
     const authority = searchParams.get("Authority");
     const status = searchParams.get("Status");
 
-    // پیدا کردن سفارش بر اساس شناسه پرداخت
+    // پیدا کردن سفارش
     const order = authority ? await prisma.order.findFirst({ 
         where: { refId: authority },
-        include: { links: true } // لینک‌های رزرو شده را هم می‌گیریم
+        include: { links: true }
     }) : null;
 
     if (!order) {
@@ -25,12 +25,12 @@ export async function GET(req: Request) {
          return NextResponse.redirect(new URL(`/delivery/${order.downloadToken}`, req.url));
     }
 
-    // تابع کمکی برای آزادسازی لینک‌ها در صورت خطا
+    // تابع آزادسازی لینک‌ها در صورت خطا
     const releaseLinks = async () => {
         if (order.links.length > 0) {
             await prisma.downloadLink.updateMany({
                 where: { orderId: order.id },
-                data: { status: "AVAILABLE", orderId: null } // قطع ارتباط و آزاد کردن
+                data: { status: "AVAILABLE", orderId: null }
             });
         }
         await prisma.order.update({ where: { id: order.id }, data: { status: "FAILED" } });
@@ -48,7 +48,7 @@ export async function GET(req: Request) {
         if (response.data && (response.data.code === 100 || response.data.code === 101)) {
             const downloadToken = crypto.randomBytes(32).toString("hex");
 
-            // ✅ نهایی کردن خرید: تغییر وضعیت لینک‌های رزرو شده به USED
+            // 1. نهایی کردن خرید: تغییر وضعیت لینک‌های رزرو شده به USED
             if (order.links.length > 0) {
                 const linkIds = order.links.map(l => l.id);
                 await prisma.downloadLink.updateMany({
@@ -60,7 +60,7 @@ export async function GET(req: Request) {
                 });
             }
 
-            // آپدیت سفارش به پرداخت شده
+            // 2. آپدیت سفارش به پرداخت شده
             await prisma.order.update({
                 where: { id: order.id },
                 data: {
@@ -70,6 +70,14 @@ export async function GET(req: Request) {
                 },
             });
 
+            // 3. ✅ اگر سفارش کد تخفیف داشت، یکی به تعداد استفاده‌اش اضافه کن
+            if (order.discountCodeId) {
+                await prisma.discountCode.update({
+                    where: { id: order.discountCodeId },
+                    data: { usedCount: { increment: 1 } }
+                });
+            }
+
             return NextResponse.redirect(new URL(`/delivery/${downloadToken}`, req.url));
         } else {
             // پرداخت توسط بانک تایید نشد
@@ -78,8 +86,6 @@ export async function GET(req: Request) {
         }
     } catch (error) {
         console.error("Verify Error:", error);
-        // در صورت خطای سرور هم محض احتیاط لینک‌ها را آزاد می‌کنیم (یا می‌توان نگه داشت برای بررسی دستی)
-        // اما برای تجربه کاربری بهتر است آزاد شوند تا دوباره تلاش کند
         await releaseLinks();
         return NextResponse.redirect(new URL("/payment/failed?error=InternalError", req.url));
     }
