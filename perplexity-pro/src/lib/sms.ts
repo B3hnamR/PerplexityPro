@@ -1,8 +1,20 @@
-// کلید API شما (بهتر است در فایل .env هم قرار دهید، اما اینجا به عنوان پیش‌فرض گذاشتم)
-const SMSIR_API_KEY = process.env.SMSIR_API_KEY || "vbMPwuG9HBURZdD6xBlZDB8FgyMtqMyV4fgSKJeBmXbwZAfp";
-const VERIFY_TEMPLATE_ID = Number(process.env.SMSIR_VERIFY_TEMPLATE_ID || 100000); // شناسه قالب پیش‌فرض
+const SMSIR_API_KEY = process.env.SMSIR_API_KEY || "";
+const VERIFY_TEMPLATE_ID = Number(process.env.SMSIR_VERIFY_TEMPLATE_ID || 100000);
 
 export async function sendOTP(mobile: string, code: string) {
+    // ✅ تغییر مهم: همیشه در محیط توسعه کد را لاگ کن (حتی اگر API Key باشد)
+    if (process.env.NODE_ENV !== "production") {
+        console.log("------------------------------------------------");
+        console.log(`🔐 DEV OTP for ${mobile}:`);
+        console.log(`👉 ${code} 👈`);
+        console.log("------------------------------------------------");
+    }
+
+    // اگر کلید نباشد، موفقیت آمیز برگردان (شبیه‌سازی)
+    if (!SMSIR_API_KEY) {
+        return true;
+    }
+
     try {
         const response = await fetch("https://api.sms.ir/v1/send/verify", {
             method: "POST",
@@ -20,6 +32,12 @@ export async function sendOTP(mobile: string, code: string) {
         });
         
         const data = await response.json();
+        
+        // لاگ کردن پاسخ برای دیباگ
+        if (process.env.NODE_ENV !== "production") {
+            console.log("SMS Provider Response:", data);
+        }
+
         return data.status === 1;
     } catch (error) {
         console.error("SMS Send Error:", error);
@@ -28,15 +46,10 @@ export async function sendOTP(mobile: string, code: string) {
 }
 
 export async function sendOrderNotification(mobile: string, trackingCode: string) {
-    // برای ارسال پیامک اطلاع‌رسانی (مثل تحویل دستی)
-    // نیاز به یک قالب جداگانه در sms.ir دارید (مثلاً با شناسه دیگر)
-    // فعلاً از همان متد verify استفاده می‌کنیم یا می‌توانید از متد bulk استفاده کنید
-    // این یک نمونه ساده با فرض وجود قالب است:
-    /*
-    return await fetch("https://api.sms.ir/v1/send/verify", {
-        // ... تنظیمات مربوط به قالب اطلاع‌رسانی
-    });
-    */
-    console.log(`SMS Notification to ${mobile}: Order ${trackingCode} is ready.`);
+    console.log("------------------------------------------------");
+    console.log(`📢 Notification for ${mobile}: Order ${trackingCode} is ready.`);
+    console.log("------------------------------------------------");
+    
+    // اینجا می‌توانید در آینده لاجیک ارسال واقعی پیامک اطلاع‌رسانی را اضافه کنید
     return true;
 }
