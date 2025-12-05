@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Search, Lock, ArrowRight, Smartphone, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
-import DeliveryClient from "../delivery/[token]/DeliveryClient"; // استفاده مجدد از کامپوننت نمایش
+import DeliveryClient from "../delivery/[token]/DeliveryClient"; 
 
 export default function TrackOrderPage() {
-    const [step, setStep] = useState(1); // 1: Code, 2: OTP, 3: Result
+    const [step, setStep] = useState(1); 
     const [trackingCode, setTrackingCode] = useState("");
     const [mobileMasked, setMobileMasked] = useState("");
     const [otp, setOtp] = useState("");
@@ -15,7 +15,6 @@ export default function TrackOrderPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // مرحله ۱: دریافت کد پیگیری و ارسال OTP
     const handleRequestOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -39,7 +38,6 @@ export default function TrackOrderPage() {
         finally { setLoading(false); }
     };
 
-    // مرحله ۲: تایید OTP و نمایش سفارش
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -76,16 +74,16 @@ export default function TrackOrderPage() {
                 <div className="bg-[#1e293b] border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
                     {step === 1 && (
                         <form onSubmit={handleRequestOtp} className="space-y-6">
-                            <div className="relative">
+                            <div className="relative group">
                                 <input
                                     type="text"
                                     placeholder="کد پیگیری (مثلاً ORD-123456)"
                                     value={trackingCode}
                                     onChange={(e) => setTrackingCode(e.target.value)}
-                                    className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-4 text-white text-center text-lg tracking-wider focus:border-cyan-500 focus:outline-none transition-colors uppercase"
+                                    className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-4 pl-12 text-white text-center text-lg tracking-wider focus:border-cyan-500 focus:outline-none transition-colors uppercase placeholder-gray-600"
                                     required
                                 />
-                                <Search className="absolute left-4 top-4.5 text-gray-500" size={20} />
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-cyan-500 transition-colors" size={20} />
                             </div>
                             <button disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-4 rounded-xl font-bold flex justify-center items-center gap-2 transition-all">
                                 {loading ? <Loader2 className="animate-spin" /> : "ادامه و تایید هویت"}
@@ -97,21 +95,21 @@ export default function TrackOrderPage() {
                         <form onSubmit={handleVerifyOtp} className="space-y-6 animate-fade-in">
                             <div className="text-center bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4">
                                 <p className="text-sm text-cyan-300 mb-1">کد تایید به شماره زیر ارسال شد:</p>
-                                <p className="text-lg font-bold font-mono text-white">{mobileMasked}</p>
+                                <p className="text-lg font-bold font-mono text-white dir-ltr">{mobileMasked}</p>
                             </div>
                             
-                            <div className="relative">
+                            <div className="relative group">
                                 <input
                                     type="text"
                                     placeholder="کد ۵ رقمی"
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value)}
-                                    className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-4 text-white text-center text-2xl tracking-[0.5em] focus:border-cyan-500 focus:outline-none transition-colors"
+                                    className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-4 pl-12 text-white text-center text-2xl tracking-[0.5em] focus:border-cyan-500 focus:outline-none transition-colors"
                                     maxLength={5}
                                     required
                                     autoFocus
                                 />
-                                <Lock className="absolute left-4 top-5 text-gray-500" size={20} />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-cyan-500 transition-colors" size={20} />
                             </div>
 
                             <div className="flex gap-3">
@@ -136,13 +134,15 @@ export default function TrackOrderPage() {
                             {orderData.links && orderData.links.length > 0 ? (
                                 <DeliveryClient links={orderData.links} />
                             ) : (
-                                <div className="text-center text-yellow-400 p-4 bg-yellow-500/10 rounded-xl border border-yellow-500/20">
-                                    لینک دانلود هنوز صادر نشده است.
+                                <div className="text-center text-yellow-400 p-6 bg-yellow-500/10 rounded-xl border border-yellow-500/20 flex flex-col items-center gap-2">
+                                    <Loader2 className="animate-spin mb-2" size={24} />
+                                    <p className="font-bold">لینک فعال سازی هنوز صادر نشده است.</p>
+                                    <p className="text-sm opacity-80">لطفا دقایقی دیگر تلاش کنید.</p>
                                 </div>
                             )}
 
-                            <button onClick={() => window.location.reload()} className="w-full mt-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-gray-400 transition-colors">
-                                جستجوی جدید
+                            <button onClick={() => window.location.reload()} className="w-full mt-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-gray-400 transition-colors text-sm">
+                                جستجوی مجدد
                             </button>
                         </div>
                     )}

@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Menu, X, Brain, User, LogOut, ChevronDown, LayoutDashboard } from "lucide-react";
+import { Menu, X, Brain, User, LogOut, ChevronDown, LayoutDashboard, ShoppingCart } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
+import { useCart } from "@/context/CartContext";
 import CheckoutModal from "./CheckoutModal";
 
 interface NavbarProps {
@@ -12,6 +13,7 @@ interface NavbarProps {
 
 export default function Navbar({ onPreOrder }: NavbarProps) {
     const { data: session } = useSession();
+    const { count } = useCart();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -22,7 +24,6 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
         
-        // بستن منو با کلیک بیرون
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsUserMenuOpen(false);
@@ -63,6 +64,16 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
 
                         {/* Actions */}
                         <div className="hidden md:flex items-center gap-4">
+                            {/* Shopping Cart */}
+                            <Link href="/cart" className="text-gray-300 hover:text-white transition-colors relative p-2">
+                                <ShoppingCart size={24} />
+                                {count > 0 && (
+                                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#0f172a]">
+                                        {count}
+                                    </span>
+                                )}
+                            </Link>
+
                             {session ? (
                                 <div className="relative" ref={dropdownRef}>
                                     <button 
@@ -78,23 +89,20 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
 
                                     {/* Dropdown Menu */}
                                     {isUserMenuOpen && (
-                                        <div className="absolute left-0 mt-2 w-48 bg-[#1e293b] border border-white/10 rounded-xl shadow-xl overflow-hidden animate-fade-in-up origin-top-left">
+                                        <div className="absolute left-0 mt-2 w-48 bg-[#1e293b] border border-white/10 rounded-xl shadow-xl overflow-hidden animate-fade-in-up origin-top-left z-50">
                                             {(session.user as any).role === "ADMIN" && (
                                                 <Link href="/admin/dashboard" className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-cyan-400 transition-colors">
                                                     <LayoutDashboard size={16} />
                                                     پنل مدیریت
                                                 </Link>
                                             )}
-                                            {/* برای کاربر عادی */}
                                             {(session.user as any).role !== "ADMIN" && (
                                                  <button onClick={onPreOrder} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-cyan-400 transition-colors text-right">
                                                     <User size={16} />
                                                     خرید اشتراک جدید
                                                 </button>
                                             )}
-                                            
                                             <div className="border-t border-white/5 my-1"></div>
-                                            
                                             <button 
                                                 onClick={() => signOut()}
                                                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-right"
@@ -117,7 +125,15 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
                         </div>
 
                         {/* Mobile Toggle */}
-                        <div className="md:hidden flex items-center">
+                        <div className="md:hidden flex items-center gap-3">
+                            <Link href="/cart" className="text-gray-300 hover:text-white relative p-1">
+                                <ShoppingCart size={24} />
+                                {count > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                                        {count}
+                                    </span>
+                                )}
+                            </Link>
                             <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 hover:text-white p-2">
                                 {isOpen ? <X size={28} /> : <Menu size={28} />}
                             </button>
