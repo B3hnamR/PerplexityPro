@@ -2,17 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { Save, Loader2, Package } from "lucide-react";
+import axios from "axios";
 
 export default function ProductPage() {
-    const [product, setProduct] = useState<any>(null);
+    const [product, setProduct] = useState<any>({ name: "", price: 0, description: "" });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        fetch("/api/admin/product")
-            .then((res) => res.json())
-            .then((data) => {
-                setProduct(data || { name: "", price: 0, description: "" });
+        axios.get("/api/admin/product")
+            .then((res) => {
+                // اگر محصولی نبود، آبجکت خالی می‌آید
+                if (res.data && res.data.id) {
+                    setProduct(res.data);
+                }
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
                 setLoading(false);
             });
     }, []);
@@ -21,12 +28,12 @@ export default function ProductPage() {
         e.preventDefault();
         setSaving(true);
         try {
-            await fetch("/api/admin/product", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(product),
+            // استفاده از POST برای ساخت یا آپدیت
+            await axios.post("/api/admin/product", {
+                ...product,
+                price: Number(product.price) // اطمینان از عدد بودن
             });
-            alert("تغییرات با موفقیت ذخیره شد");
+            alert("محصول با موفقیت ذخیره شد");
         } catch (error) {
             console.error(error);
             alert("خطا در ذخیره سازی");
@@ -35,7 +42,7 @@ export default function ProductPage() {
         }
     };
 
-    if (loading) return <div className="text-center p-10 text-gray-400">در حال دریافت اطلاعات...</div>;
+    if (loading) return <div className="text-center p-10 text-gray-400">در حال بارگذاری...</div>;
 
     return (
         <div className="max-w-2xl mx-auto animate-fade-in">
@@ -44,7 +51,7 @@ export default function ProductPage() {
                     <Package className="text-cyan-400" />
                     مدیریت محصول
                 </h1>
-                <p className="text-gray-400">اطلاعات محصولی که در صفحه اصلی نمایش داده می‌شود را ویرایش کنید.</p>
+                <p className="text-gray-400">اطلاعات محصول اصلی فروشگاه را در اینجا ویرایش کنید.</p>
             </div>
 
             <form onSubmit={handleSave} className="bg-[#1e293b] border border-white/5 rounded-3xl p-8 space-y-6 shadow-xl">
@@ -64,19 +71,18 @@ export default function ProductPage() {
                     <input
                         type="number"
                         value={product.price}
-                        onChange={(e) => setProduct({ ...product, price: Number(e.target.value) })}
+                        onChange={(e) => setProduct({ ...product, price: e.target.value })}
                         className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none transition-colors dir-ltr text-left"
                         required
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-bold text-gray-300 mb-2">توضیحات کوتاه</label>
+                    <label className="block text-sm font-bold text-gray-300 mb-2">توضیحات</label>
                     <textarea
                         value={product.description || ""}
                         onChange={(e) => setProduct({ ...product, description: e.target.value })}
                         className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none transition-colors min-h-[120px]"
-                        placeholder="توضیحاتی که زیر نام محصول نمایش داده می‌شود..."
                     />
                 </div>
 
@@ -86,17 +92,7 @@ export default function ProductPage() {
                         disabled={saving}
                         className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-cyan-500/25 disabled:opacity-50"
                     >
-                        {saving ? (
-                            <>
-                                <Loader2 className="animate-spin" />
-                                در حال ذخیره...
-                            </>
-                        ) : (
-                            <>
-                                <Save size={20} />
-                                ذخیره تغییرات
-                            </>
-                        )}
+                        {saving ? <Loader2 className="animate-spin" /> : <><Save size={20} /> ذخیره تغییرات</>}
                     </button>
                 </div>
             </form>

@@ -4,12 +4,11 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
+  // 1. Create Admin
   const email = 'admin@admin.com'
-  const password = 'admin' // رمز عبور دلخواه
-  
+  const password = 'admin'
   const hashedPassword = await bcrypt.hash(password, 10)
-
-  const admin = await prisma.admin.upsert({
+  await prisma.admin.upsert({
     where: { email },
     update: {},
     create: {
@@ -19,13 +18,21 @@ async function main() {
     },
   })
 
-  console.log({ admin })
+  // 2. Create Default Product (Fix for "Product not found" error)
+  await prisma.product.create({
+    data: {
+      name: "Perplexity Pro Subscription",
+      description: "دسترسی به هوش مصنوعی‌های GPT-4, Claude 3 و...",
+      price: 398000,
+      imageUrl: "/perplexity-pro-logo.png"
+    }
+  });
+
+  console.log("Seed completed!")
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
+  .then(async () => { await prisma.$disconnect() })
   .catch(async (e) => {
     console.error(e)
     await prisma.$disconnect()

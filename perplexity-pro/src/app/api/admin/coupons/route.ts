@@ -10,8 +10,7 @@ export async function GET(req: Request) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const coupons = await prisma.discountCode.findMany({
-        orderBy: { createdAt: "desc" },
-        include: { _count: { select: { orders: true } } }
+        orderBy: { createdAt: "desc" }
     });
     return NextResponse.json(coupons);
 }
@@ -22,32 +21,52 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        // اعتبارسنجی
-        const validation = couponSchema.safeParse(body);
-        if (!validation.success) return NextResponse.json({ error: "داده نامعتبر" }, { status: 400 });
+        const { id, ...data } = body;
 
-        const { code, type, value, minOrderPrice, maxDiscount, maxUses, expiresAt, isActive } = validation.data;
+        // اگر ID داشتیم یعنی آپدیت
+        if (id) {
+            const updated = await prisma.discountCode.update({
+                where: { id },
+                data: {
+                    code: data.code,
+                    type: data.type,
+                    value: Number(data.value),
+                    minOrderPrice: Number(data.minOrderPrice) || null,
+                    maxDiscount: Number(data.maxDiscount) || null,
+                    maxUses: Number(data.maxUses) || null,
+                    isActive: data.isActive
+                }
+            });
+            return NextResponse.json(updated);
+        } 
+        
+        // اگر ID نداشتیم یعنی جدید
+        else {
+            const validation = couponSchema.safeParse(data);
+            if (!validation.success) return NextResponse.json({ error: "داده نامعتبر" }, { status: 400 });
 
-        const coupon = await prisma.discountCode.create({
-            data: {
-                code,
-                type,
-                value,
-                minOrderPrice,
-                maxDiscount,
-                maxUses,
-                expiresAt: expiresAt ? new Date(expiresAt) : null,
-                isActive
-            }
-        });
-        return NextResponse.json(coupon);
+            const created = await prisma.discountCode.create({
+                data: {
+                    code: data.code,
+                    type: data.type,
+                    value: data.value,
+                    minOrderPrice: data.minOrderPrice,
+                    maxDiscount: data.maxDiscount,
+                    maxUses: data.maxUses,
+                    isActive: data.isActive
+                }
+            });
+            return NextResponse.json(created);
+        }
     } catch (error) {
-        return NextResponse.json({ error: "Code already exists" }, { status: 400 });
+        return NextResponse.json({ error: "Error" }, { status: 400 });
     }
 }
 
 export async function DELETE(req: Request) {
-    // ... (مشابه بقیه، کد حذف)
+    const session = await auth();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if(!id) return NextResponse.json({error: "ID Required"}, {status:400});

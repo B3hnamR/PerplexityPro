@@ -33,7 +33,7 @@ export default function CartPage() {
 
             if (res.ok) {
                 applyDiscount(data);
-                setCouponCode(""); // فیلد را خالی کن
+                setCouponCode(""); 
             } else {
                 setCouponError(data.error);
             }
@@ -65,12 +65,24 @@ export default function CartPage() {
             <Navbar onPreOrder={handlePreOrder} />
 
             <div className="pt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Header with Description */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fade-in">
                     <div>
                         <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-3">
                             سبد خرید
                         </span>
                         <h1 className="text-3xl md:text-4xl font-black text-white mb-2">تکمیل سفارش</h1>
+                        <p className="text-gray-400 max-w-2xl leading-relaxed text-sm">
+                            محصولات انتخابی خود را مرور کنید. با نهایی کردن سفارش، لایسنس به صورت آنی برای شما صادر می‌شود.
+                        </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 bg-[#1e293b]/50 border border-white/5 px-4 py-3 rounded-xl backdrop-blur-sm">
+                        <ShieldCheck className="text-emerald-400" size={20} />
+                        <div className="flex flex-col text-xs text-gray-400">
+                            <span className="text-gray-300 font-bold">پرداخت امن و تضمینی</span>
+                            <span>رمزگذاری شده با SSL ۲۵۶ بیتی</span>
+                        </div>
                     </div>
                 </div>
 
@@ -94,6 +106,7 @@ export default function CartPage() {
                                         </div>
                                         <div className="flex-1 text-center sm:text-right w-full">
                                             <h3 className="font-bold text-lg text-white mb-1">{item.name}</h3>
+                                            <p className="text-sm text-gray-400 mb-2 sm:mb-0">اکانت پرمیوم ۱ ساله با قابلیت‌های کامل</p>
                                             <div className="sm:hidden font-bold text-cyan-400 text-lg mt-2">{formatPrice(item.price)} ت</div>
                                         </div>
                                         <div className="flex items-center gap-4">
@@ -114,7 +127,7 @@ export default function CartPage() {
                         <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
                             <div className="bg-[#1e293b] border border-white/10 rounded-2xl p-6 sticky top-24 shadow-xl">
                                 
-                                {/* بخش کد تخفیف */}
+                                {/* Coupon Section */}
                                 <div className="mb-6">
                                     {!discount ? (
                                         <div className="relative">
