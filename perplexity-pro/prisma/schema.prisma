@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql" // تغییر از sqlite به mysql (برای MariaDB هم همین است)
   url      = env("DATABASE_URL")
 }
 
@@ -19,9 +19,9 @@ model Admin {
 model Product {
   id          String   @id @default(cuid())
   name        String
-  description String
+  description String   @db.Text // اضافه کردن @db.Text برای متن‌های طولانی
   price       Float
-  fileUrl     String?  // مسیر فایل یا لینک برای محصولات ساده
+  fileUrl     String?
   imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -29,21 +29,19 @@ model Product {
 
 model Order {
   id            String   @id @default(cuid())
-  refId         String?  @unique // شناسه پرداخت زرین‌پال
-  trackingCode  String?  @unique // کد پیگیری کوتاه
+  refId         String?  @unique
+  trackingCode  String?  @unique
   amount        Float
   quantity      Int      @default(1)
-  status        String   @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  status        String   @default("PENDING") // PENDING, PAID, FAILED
   
-  // اطلاعات مشتری (ایمیل اختیاری شده تا با فرم خرید هماهنگ باشد)
   customerEmail String?
   customerPhone String?
   
-  downloadToken String?  @unique // توکن امن برای صفحه تحویل
+  downloadToken String?  @unique
   downloadCount Int      @default(0)
-  customData    String?  // ذخیره اطلاعات فیلدهای اضافی به صورت JSON
+  customData    String?  @db.Text // اضافه کردن @db.Text چون JSON ممکن است طولانی باشد
   
-  // ارتباط با لینک‌های تحویل داده شده
   links         DownloadLink[]
 
   createdAt     DateTime @default(now())
@@ -54,9 +52,9 @@ model CustomField {
   id          String   @id @default(cuid())
   label       String
   name        String   @unique
-  type        String   // text, number, select, etc.
+  type        String
   required    Boolean  @default(false)
-  options     String?  // گزینه‌ها برای select به صورت JSON
+  options     String?  @db.Text // گزینه‌ها ممکن است زیاد باشند
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -64,7 +62,7 @@ model CustomField {
 
 model DownloadLink {
   id         String   @id @default(cuid())
-  url        String
+  url        String   @db.Text // لینک‌ها ممکن است خیلی طولانی باشند
   status     String   @default("AVAILABLE") // AVAILABLE, USED
   
   orderId    String?
@@ -73,4 +71,7 @@ model DownloadLink {
   consumedAt DateTime?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  
+  // ایجاد ایندکس روی orderId برای سرعت بالاتر در جستجو (اختیاری ولی پیشنهادی)
+  @@index([orderId])
 }

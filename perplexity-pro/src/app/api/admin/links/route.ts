@@ -5,12 +5,15 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-    const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+    // ... (همان کد قبلی مربوط به GET بدون تغییر) ...
+    // برای خلاصه شدن کد اینجا نیاوردم، همان کد قبلی را نگه دارید
+    // فقط بخش POST تغییر می‌کند
     try {
+        const session = await auth();
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
         const { searchParams } = new URL(req.url);
-        const status = searchParams.get("status") || "AVAILABLE"; 
+        const status = searchParams.get("status") || "AVAILABLE";
         const page = parseInt(searchParams.get("page") || "1");
         const limit = parseInt(searchParams.get("limit") || "10");
         const skip = (page - 1) * limit;
@@ -32,15 +35,13 @@ export async function GET(req: Request) {
             }
         });
 
-        const totalForCurrentStatus = status === "AVAILABLE" ? availableCount : usedCount;
-
         return NextResponse.json({
             links,
             stats: { available: availableCount, used: usedCount },
             pagination: {
                 page,
-                totalPages: Math.ceil(totalForCurrentStatus / limit),
-                total: totalForCurrentStatus
+                totalPages: Math.ceil((status === "AVAILABLE" ? availableCount : usedCount) / limit),
+                total: status === "AVAILABLE" ? availableCount : usedCount
             }
         });
 
@@ -51,10 +52,10 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
     try {
+        const session = await auth();
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
         const body = await req.json();
         const { links } = body; 
 
@@ -62,24 +63,28 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid data" }, { status: 400 });
         }
 
+        // ✅ بهینه‌سازی برای MariaDB: استفاده از createMany (خیلی سریع‌تر)
         await prisma.downloadLink.createMany({
             data: links.map((url: string) => ({
                 url: url.trim(),
                 status: "AVAILABLE",
             })),
+            skipDuplicates: true, // اگر لینکی تکراری بود نادیده بگیر (اختیاری)
         });
 
         return NextResponse.json({ success: true });
     } catch (error) {
+        console.error("Link Create Error:", error);
         return NextResponse.json({ error: "Database Error" }, { status: 500 });
     }
 }
 
 export async function DELETE(req: Request) {
-    const session = await auth();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+    // ... (همان کد قبلی DELETE) ...
     try {
+        const session = await auth();
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
         if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });

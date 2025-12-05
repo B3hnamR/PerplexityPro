@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Brain, Lock, Loader2, Mail } from "lucide-react";
 
-export default function AdminLoginPage() {
+export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -38,11 +38,9 @@ export default function AdminLoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#0f172a] p-4 text-white font-sans selection:bg-cyan-500/30">
-            {/* Background Glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-lg max-h-lg bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
             <div className="relative w-full max-w-md">
-                {/* Logo Section */}
                 <div className="text-center mb-8 animate-fade-in-up">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 shadow-[0_0_30px_rgba(6,182,212,0.4)] mb-4 transform rotate-6 hover:rotate-0 transition-all duration-500">
                         <Brain size={36} className="text-white" />
@@ -51,7 +49,6 @@ export default function AdminLoginPage() {
                     <p className="text-gray-400 text-sm">به پنل مدیریت Perplexity Pro خوش آمدید</p>
                 </div>
 
-                {/* Login Card */}
                 <div className="bg-[#1e293b]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {error && (
@@ -106,10 +103,6 @@ export default function AdminLoginPage() {
                         </button>
                     </form>
                 </div>
-                
-                <p className="text-center text-gray-500 text-xs mt-8">
-                    © ۲۰۲۵ تمامی حقوق محفوظ است
-                </p>
             </div>
         </div>
     );

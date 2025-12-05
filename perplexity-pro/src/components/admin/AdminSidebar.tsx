@@ -52,7 +52,7 @@ export default function AdminSidebar() {
             <div className="p-4 border-t border-white/5">
                 <button 
                     className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all font-medium border border-transparent hover:border-red-500/20"
-                    onClick={() => signOut({ callbackUrl: "/admin/login" })}
+                    onClick={() => signOut({ callbackUrl: "/auth/login" })}
                 >
                     <LogOut size={18} />
                     <span>خروج از حساب</span>
