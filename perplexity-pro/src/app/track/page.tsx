@@ -1,9 +1,8 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { Search, Lock, ArrowRight, Smartphone, Loader2 } from "lucide-react";
+import { Search, Lock, ArrowRight, Smartphone, Loader2, AlertCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import Link from "next/link";
 import DeliveryClient from "../delivery/[token]/DeliveryClient"; 
 
 export default function TrackOrderPage() {
@@ -94,8 +93,9 @@ export default function TrackOrderPage() {
                     {step === 2 && (
                         <form onSubmit={handleVerifyOtp} className="space-y-6 animate-fade-in">
                             <div className="text-center bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4">
-                                <p className="text-sm text-cyan-300 mb-1">کد تایید به شماره زیر ارسال شد:</p>
-                                <p className="text-lg font-bold font-mono text-white dir-ltr">{mobileMasked}</p>
+                                <p className="text-sm text-cyan-300 mb-2">کد تایید به شماره زیر ارسال شد:</p>
+                                {/* اصلاح: استفاده از dir="ltr" برای نمایش صحیح ترتیب اعداد */}
+                                <p className="text-xl font-bold font-mono text-white" dir="ltr">{mobileMasked}</p>
                             </div>
                             
                             <div className="relative group">
@@ -130,14 +130,16 @@ export default function TrackOrderPage() {
                                 <span className="text-emerald-400 font-bold">پرداخت شده</span>
                             </div>
 
-                            {/* نمایش لینک‌ها با کامپوننت آماده */}
                             {orderData.links && orderData.links.length > 0 ? (
                                 <DeliveryClient links={orderData.links} />
                             ) : (
-                                <div className="text-center text-yellow-400 p-6 bg-yellow-500/10 rounded-xl border border-yellow-500/20 flex flex-col items-center gap-2">
-                                    <Loader2 className="animate-spin mb-2" size={24} />
-                                    <p className="font-bold">لینک فعال سازی هنوز صادر نشده است.</p>
-                                    <p className="text-sm opacity-80">لطفا دقایقی دیگر تلاش کنید.</p>
+                                // متن اصلاح شده
+                                <div className="text-center text-yellow-400 p-6 bg-yellow-500/10 rounded-xl border border-yellow-500/20 flex flex-col items-center gap-3">
+                                    <AlertCircle className="animate-pulse" size={32} />
+                                    <p className="font-bold text-lg">لینک فعال‌سازی هنوز صادر نشده است.</p>
+                                    <p className="text-sm opacity-80 leading-relaxed">
+                                        لطفاً دقایقی دیگر تلاش کنید. همکاران ما به زودی لینک را برای شما ارسال خواهند کرد.
+                                    </p>
                                 </div>
                             )}
 
