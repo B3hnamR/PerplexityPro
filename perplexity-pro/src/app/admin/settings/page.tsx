@@ -1,23 +1,72 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Settings as SettingsIcon, Save } from "lucide-react";
+import { Plus, Trash2, Settings as SettingsIcon, Loader2 } from "lucide-react";
+import axios from "axios";
 
 export default function SettingsPage() {
     const [fields, setFields] = useState<any[]>([]);
-    const [newField, setNewField] = useState({ label: "", type: "text", required: true });
-    
-    // Fetch existing fields logic here if you have an API for it
-    // For now I'll implement the UI assuming you want to manage dynamic fields for user input during checkout
+    const [newField, setNewField] = useState({ label: "", type: "text", required: true, name: "" });
+    const [loading, setLoading] = useState(true);
+    const [adding, setAdding] = useState(false);
 
-    const addField = () => {
-        if(!newField.label) return;
-        setFields([...fields, { ...newField, id: Date.now().toString() }]);
-        setNewField({ label: "", type: "text", required: true });
+    // 1. دریافت فیلدها از سرور هنگام لود صفحه
+    useEffect(() => {
+        fetchFields();
+    }, []);
+
+    const fetchFields = async () => {
+        try {
+            const res = await axios.get("/api/admin/fields");
+            setFields(res.data);
+        } catch (error) {
+            console.error("Error fetching fields:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const removeField = (id: string) => {
-        setFields(fields.filter(f => f.id !== id));
+    // 2. افزودن فیلد جدید به دیتابیس
+    const addField = async () => {
+        if (!newField.label) return alert("عنوان فیلد الزامی است");
+        
+        setAdding(true);
+        try {
+            // تولید نام انگلیسی خودکار برای فیلد (مثلاً "شماره تلگرام" -> "field_123456")
+            const generatedName = `field_${Date.now()}`;
+            
+            const payload = {
+                ...newField,
+                name: generatedName, // نام یکتا برای دیتابیس
+            };
+
+            await axios.post("/api/admin/fields", payload);
+            
+            // ریست کردن فرم و رفرش لیست
+            setNewField({ label: "", type: "text", required: true, name: "" });
+            fetchFields();
+        } catch (error) {
+            console.error(error);
+            alert("خطا در ذخیره فیلد");
+        } finally {
+            setAdding(false);
+        }
+    };
+
+    // 3. حذف فیلد از دیتابیس
+    const removeField = async (id: string) => {
+        if(!confirm("آیا از حذف این فیلد مطمئن هستید؟")) return;
+
+        try {
+            // آپدیت استیت برای حذف سریع (Optimistic UI)
+            setFields(prev => prev.filter(f => f.id !== id));
+            
+            await axios.delete(`/api/admin/fields?id=${id}`);
+        } catch (error) {
+            console.error(error);
+            alert("خطا در حذف");
+            fetchFields(); // برگرداندن لیست در صورت خطا
+        }
     };
 
     return (
@@ -32,7 +81,7 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Form to Add */}
-                <div className="bg-[#1e293b] border border-white/5 rounded-2xl p-6 h-fit shadow-lg">
+                <div className="bg-[#1e293b] border border-white/5 rounded-2xl p-6 h-fit shadow-lg sticky top-6">
                     <h3 className="text-lg font-bold text-white mb-4">افزودن فیلد جدید</h3>
                     <div className="space-y-4">
                         <div>
@@ -42,12 +91,12 @@ export default function SettingsPage() {
                                 value={newField.label}
                                 onChange={(e) => setNewField({...newField, label: e.target.value})}
                                 placeholder="مثلاً: نام کاربری تلگرام"
-                                className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-cyan-500 focus:outline-none"
+                                className="w-full bg-[#0f172a] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none transition-colors"
                             />
                         </div>
                         
-                        <div className="flex items-center gap-4">
-                            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
+                        <div className="flex items-center gap-4 bg-[#0f172a] p-3 rounded-xl border border-white/5">
+                            <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer w-full">
                                 <input 
                                     type="checkbox" 
                                     checked={newField.required}
@@ -60,45 +109,51 @@ export default function SettingsPage() {
 
                         <button 
                             onClick={addField}
-                            className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+                            disabled={adding || !newField.label}
+                            className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
                         >
-                            <Plus size={18} />
-                            افزودن
+                            {adding ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
+                            افزودن فیلد
                         </button>
                     </div>
                 </div>
 
                 {/* List */}
-                <div className="space-y-3">
-                    <h3 className="text-lg font-bold text-white mb-4">فیلدهای فعال</h3>
-                    {fields.length === 0 ? (
-                        <div className="text-gray-500 text-center py-8 border border-white/5 rounded-xl border-dashed">
+                <div className="space-y-4">
+                    <h3 className="text-lg font-bold text-white">فیلدهای فعال</h3>
+                    
+                    {loading ? (
+                        <div className="text-center py-10 text-gray-500">
+                            <Loader2 className="animate-spin mx-auto mb-2" />
+                            در حال بارگذاری...
+                        </div>
+                    ) : fields.length === 0 ? (
+                        <div className="text-gray-500 text-center py-12 border-2 border-dashed border-white/5 rounded-2xl bg-[#1e293b]/30">
                             هنوز فیلدی اضافه نشده است.
                         </div>
                     ) : (
-                        fields.map((field) => (
-                            <div key={field.id} className="bg-[#1e293b] p-4 rounded-xl border border-white/5 flex items-center justify-between group">
-                                <div>
-                                    <p className="text-white font-bold">{field.label}</p>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        {field.required ? "اجباری" : "اختیاری"} • {field.type}
-                                    </p>
+                        <div className="space-y-3">
+                            {fields.map((field) => (
+                                <div key={field.id} className="bg-[#1e293b] p-5 rounded-xl border border-white/5 flex items-center justify-between group hover:border-white/10 transition-all shadow-md">
+                                    <div>
+                                        <p className="text-white font-bold text-lg mb-1">{field.label}</p>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-[10px] px-2 py-0.5 rounded border ${field.required ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"}`}>
+                                                {field.required ? "اجباری" : "اختیاری"}
+                                            </span>
+                                            <span className="text-xs text-gray-500 font-mono">{field.type}</span>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => removeField(field.id)}
+                                        className="p-3 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                        title="حذف"
+                                    >
+                                        <Trash2 size={20} />
+                                    </button>
                                 </div>
-                                <button 
-                                    onClick={() => removeField(field.id)}
-                                    className="p-2 text-gray-500 hover:text-red-400 bg-white/5 rounded-lg transition-colors"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                            </div>
-                        ))
-                    )}
-                    
-                    {fields.length > 0 && (
-                        <button className="w-full mt-4 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-2">
-                            <Save size={18} />
-                            ذخیره تنظیمات
-                        </button>
+                            ))}
+                        </div>
                     )}
                 </div>
             </div>
