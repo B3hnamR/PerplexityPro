@@ -112,3 +112,11 @@ model DownloadLink {
   
   @@index([orderId])
 }
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  adminEmail String
+  action    String   // مثلا: "CREATE_PRODUCT", "UPDATE_ORDER"
+  details   String?
+  createdAt DateTime @default(now())
+}
