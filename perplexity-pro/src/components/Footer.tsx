@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { Brain, Instagram, Send, Shield, CheckCircle } from "lucide-react";
+import { Brain, Instagram, Send, Shield, CreditCard } from "lucide-react";
 
 export default function Footer() {
     return (
@@ -42,35 +42,37 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* ستون ۳: قوانین و پشتیبانی (✅ لینک‌های جدید) */}
+                    {/* ستون ۳: قوانین و پشتیبانی */}
                     <div>
                         <h4 className="font-bold text-white mb-6">قوانین و پشتیبانی</h4>
                         <ul className="space-y-3 text-gray-400 text-sm">
                             <li><Link href="/contact" className="hover:text-cyan-400 transition-colors">تماس با ما</Link></li>
                             <li><Link href="/terms" className="hover:text-cyan-400 transition-colors">قوانین و مقررات</Link></li>
                             <li><Link href="/privacy" className="hover:text-cyan-400 transition-colors">حریم خصوصی</Link></li>
-                            {/* لینک بازگشت وجه معمولاً داخل همان قوانین است، اما اگر صفحه جدا دارید این را فعال کنید */}
-                            {/* <li><Link href="/refund" className="hover:text-cyan-400 transition-colors">رویه بازگرداندن وجه</Link></li> */}
                         </ul>
                     </div>
 
-                    {/* ستون ۴: نماد اعتماد (✅ محل قرارگیری اینماد) */}
+                    {/* ستون ۴: مجوزها (✅ ویرایش شده) */}
                     <div>
                         <h4 className="font-bold text-white mb-6">مجوزها و امنیت</h4>
-                        <div className="space-y-3">
-                            {/* محل قرارگیری کد اینماد (بعداً جایگزین کنید) */}
+                        <div className="flex flex-wrap gap-3">
+
+                            {/* جایگاه نماد اعتماد (اینماد) */}
                             <div className="bg-white p-2 rounded-xl w-fit cursor-pointer hover:opacity-90 transition-opacity">
-                                {/* فعلاً یک عکس فیک یا متن می‌گذاریم تا چیدمان حفظ شود */}
-                                <div className="w-24 h-24 flex flex-col items-center justify-center border-2 border-gray-100 rounded-lg text-gray-400 text-[10px] text-center">
-                                    <Shield size={24} className="mb-1 opacity-50" />
-                                    محل نماد اعتماد
+                                <div className="w-20 h-20 flex flex-col items-center justify-center border-2 border-gray-100 rounded-lg text-gray-400 text-[10px] text-center">
+                                    <Shield size={24} className="mb-1 opacity-50 text-blue-500" />
+                                    نماد اعتماد
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2 text-xs text-gray-400 bg-[#1e293b] p-2 rounded-lg border border-white/5 w-fit">
-                                <CheckCircle size={14} className="text-emerald-400" />
-                                <span>درگاه پرداخت امن زرین‌پال</span>
+                            {/* جایگاه نماد زرین‌پال (اضافه شده) */}
+                            <div className="bg-white p-2 rounded-xl w-fit cursor-pointer hover:opacity-90 transition-opacity">
+                                <div className="w-20 h-20 flex flex-col items-center justify-center border-2 border-gray-100 rounded-lg text-gray-400 text-[10px] text-center">
+                                    <CreditCard size={24} className="mb-1 opacity-50 text-yellow-500" />
+                                    زرین‌پال
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
