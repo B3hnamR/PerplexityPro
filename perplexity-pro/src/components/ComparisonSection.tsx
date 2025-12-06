@@ -47,14 +47,20 @@ const comparisonData = [
     }
 ];
 
-export default function ComparisonSection() {
+interface ComparisonSectionProps {
+    product?: { price?: number | null } | null;
+}
+
+export default function ComparisonSection({ product }: ComparisonSectionProps) {
+    const price = product?.price ?? 398000;
+
     return (
         <section className="py-24 relative overflow-hidden">
             <div className="absolute top-1/3 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                
+
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tight">
                         چرا باید به <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Pro</span> ارتقا دهید؟
@@ -66,9 +72,9 @@ export default function ComparisonSection() {
 
                 <div className="relative">
                     <div className="absolute inset-0 bg-[#1e293b]/40 backdrop-blur-xl rounded-[2.5rem] border border-white/5"></div>
-                    
+
                     <div className="relative grid grid-cols-1 md:grid-cols-3 p-2 md:p-4 gap-4">
-                        
+
                         <div className="hidden md:flex flex-col justify-center space-y-8 p-8">
                             {comparisonData.map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-3 text-gray-300 font-medium h-12">
@@ -86,7 +92,7 @@ export default function ComparisonSection() {
                                 <p className="text-3xl font-black text-white mb-1">۰ <span className="text-sm font-normal text-gray-500">تومان</span></p>
                                 <p className="text-xs text-gray-500">مناسب برای جستجوهای ساده</p>
                             </div>
-                            
+
                             <div className="space-y-8">
                                 {comparisonData.map((item, idx) => (
                                     <div key={idx} className="flex flex-col md:flex-row md:items-center justify-center md:justify-start h-auto md:h-12 text-center md:text-right gap-2">
@@ -109,7 +115,7 @@ export default function ComparisonSection() {
                                 <h3 className="text-xl font-bold text-cyan-400 mb-2 flex items-center justify-center gap-2">
                                     Perplexity Pro <Zap size={18} className="fill-cyan-400" />
                                 </h3>
-                                <p className="text-3xl font-black text-white mb-1">۳۹۸,۰۰۰ <span className="text-sm font-normal text-gray-400">تومان</span></p>
+                                <p className="text-3xl font-black text-white mb-1">{price.toLocaleString("fa-IR")} <span className="text-sm font-normal text-gray-400">تومان</span></p>
                                 <p className="text-xs text-cyan-200/70">قدرت بی‌نهایت هوش مصنوعی</p>
                             </div>
 

@@ -35,27 +35,27 @@ export default function HomeClient({ product }: HomeClientProps) {
     return (
         <main className="bg-[#0f172a] min-h-screen text-white overflow-x-hidden font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
             <Navbar onPreOrder={handlePreOrder} />
-            
+
             <div className="space-y-0">
                 <Hero onPreOrder={handlePreOrder} />
-                
+
                 <div className="relative z-20">
                     <SmartSearchDemo />
                 </div>
-                
+
                 {/* جدول مقایسه */}
-                <ComparisonSection />
+                <ComparisonSection product={product} />
 
                 {/* مشخصات فنی کامل (جایگزین بخش قدیمی) */}
                 <FullSpecsSection />
-                
+
                 <PricingSection product={product} />
-                
+
                 <FAQSection />
-                
+
                 <TestimonialsSection />
             </div>
-            
+
             <Footer />
             <ScrollToTop />
         </main>
