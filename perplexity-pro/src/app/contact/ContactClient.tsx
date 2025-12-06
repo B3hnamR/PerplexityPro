@@ -11,7 +11,6 @@ export default function ContactClient() {
     const { addItem } = useCart();
 
     const handlePreOrder = () => {
-        // هدایت به بخش قیمت‌ها یا افزودن محصول پیش‌فرض
         addItem({
             id: "perplexity-pro-1year",
             name: "Perplexity Pro Subscription",
@@ -21,9 +20,12 @@ export default function ContactClient() {
     };
 
     return (
-        <main className="min-h-screen bg-[#0f172a] text-white font-sans">
+        // ✅ اضافه شدن flex و flex-col
+        <main className="min-h-screen bg-[#0f172a] text-white font-sans flex flex-col">
             <Navbar onPreOrder={handlePreOrder} />
-            <div className="pt-32 pb-20 max-w-4xl mx-auto px-4">
+
+            {/* ✅ اضافه شدن flex-1 برای پر کردن فضای خالی و w-full */}
+            <div className="flex-1 w-full pt-32 pb-20 max-w-4xl mx-auto px-4">
                 <h1 className="text-3xl font-black mb-8 text-center">تماس با ما</h1>
 
                 <div className="bg-[#1e293b] border border-white/5 rounded-3xl p-8 shadow-xl">
