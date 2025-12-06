@@ -5,8 +5,8 @@ import { useCart } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import SmartSearchDemo from "@/components/SmartSearchDemo";
-import ComparisonSection from "@/components/ComparisonSection"; // جدول مقایسه‌ای که ساختیم
-import FullSpecsSection from "@/components/FullSpecsSection";   // ✅ بخش جدید مشخصات کامل
+import ComparisonSection from "@/components/ComparisonSection";
+import FullSpecsSection from "@/components/FullSpecsSection"; // ✅ بخش جدید
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -43,10 +43,9 @@ export default function HomeClient({ product }: HomeClientProps) {
                     <SmartSearchDemo />
                 </div>
                 
-                {/* جدول مقایسه رایگان vs پرو (که قبلاً تایید کردید) */}
                 <ComparisonSection />
 
-                {/* ✅ لیست کامل مشخصات با تول‌تیپ (جایگزین StorySection) */}
+                {/* ✅ لیست کامل مشخصات جایگزین بخش‌های قدیمی شد */}
                 <FullSpecsSection />
                 
                 <PricingSection product={product} />

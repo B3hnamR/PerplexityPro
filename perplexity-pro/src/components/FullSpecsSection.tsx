@@ -2,123 +2,127 @@
 
 import { 
     Search, Cpu, FileText, Image as ImageIcon, 
-    Code2, Users, ShieldCheck, Sparkles 
+    Code2, Users, Sparkles, Link2, Database 
 } from "lucide-react";
 
 const specifications = [
-    {
-        category: "جستجو و تحقیق (Core Research)",
-        icon: Search,
-        features: [
-            {
-                title: "Pro Search نامحدود",
-                desc: "انجام بیش از ۳۰۰ بار جستجوی پیشرفته در روز با استدلال چندمرحله‌ای برای رسیدن به دقیق‌ترین پاسخ."
-            },
-            {
-                title: "Deep Research",
-                desc: "تحقیقات خودکار و عمیق که صدها منبع را بررسی می‌کند و یک گزارش جامع تولید می‌کند (بدون محدودیت)."
-            },
-            {
-                title: "استنادات ۱۰ برابری",
-                desc: "پاسخ‌های تولید شده دارای ۱۰ برابر منبع و رفرنس بیشتر نسبت به نسخه رایگان هستند تا شفافیت اطلاعات تضمین شود."
-            },
-            {
-                title: "حالت‌های جستجو",
-                desc: "دسترسی به ۴ موتور جستجوی تخصصی: Writing (تولید متن)، Academic (مقالات علمی)، YouTube و Reddit."
-            }
-        ]
-    },
     {
         category: "مدل‌های هوش مصنوعی (AI Models)",
         icon: Cpu,
         features: [
             {
-                title: "GPT-5.1 (OpenAI)",
-                desc: "جدیدترین و قدرتمندترین مدل OpenAI با قابلیت استدلال فوق‌العاده و کدنویسی پیشرفته."
+                title: "GPT-4o (OpenAI)",
+                desc: "جدیدترین مدل پرچمدار OpenAI با سرعت بالا و قابلیت‌های چندوجهی پیشرفته."
             },
             {
                 title: "Claude 3.5 Sonnet",
-                desc: "مدل قدرتمند Anthropic با پنجره متنی بزرگ (Context Window) برای تحلیل اسناد طولانی."
+                desc: "مدل قدرتمند آنتروپیک با پنجره متنی بزرگ، ایده‌آل برای تحلیل متون طولانی و کدنویسی."
             },
             {
-                title: "Gemini 3 Pro",
-                desc: "مدل پیشرفته گوگل با سرعت پردازش بالا و درک چندوجهی (Multimodal)."
+                title: "Sonar Huge (Llama 3.1 405B)",
+                desc: "قدرتمندترین مدل متن‌باز جهان، بهینه شده توسط Perplexity برای جستجوی دقیق."
             },
             {
-                title: "Sonar (Perplexity)",
-                desc: "مدل اختصاصی بهینه‌شده برای جستجوی زنده وب، مبتنی بر Llama 3.1 70B."
+                title: "Sonar Large (Llama 3.1 70B)",
+                desc: "نسخه سریع و کارآمد مدل Sonar برای پاسخ‌های بلادرنگ و دقیق."
             }
         ]
     },
     {
-        category: "تحلیل داده و فایل (Data Analysis)",
-        icon: FileText,
-        features: [
-            {
-                title: "آپلود نامحدود فایل",
-                desc: "هیچ محدودیتی در تعداد فایل‌های آپلود شده وجود ندارد (PDF, CSV, Code, Images)."
-            },
-            {
-                title: "رونویسی (Transcription)",
-                desc: "تبدیل خودکار محتوای فایل‌های صوتی و ویدیویی آپلود شده به متن قابل جستجو و خلاصه."
-            },
-            {
-                title: "تحلیل دسته‌ای",
-                desc: "امکان آپلود همزمان تا ۱۰ فایل در هر درخواست برای مقایسه و تحلیل ترکیبی."
-            }
-        ]
-    },
-    {
-        category: "تولید تصویر (Visual AI)",
+        category: "تولید تصویر (Image Generation)",
         icon: ImageIcon,
         features: [
             {
+                title: "Playground v3",
+                desc: "موتور قدرتمند برای طراحی‌های گرافیکی، لوگو و تصاویر هنری با استایل‌های خاص."
+            },
+            {
                 title: "DALL-E 3",
-                desc: "پیشرفته‌ترین مدل تولید تصویر OpenAI با درک دقیق دستورات متنی پیچیده."
+                desc: "بهترین مدل برای درک دقیق پرامپت‌ها و تبدیل متن به تصویر با جزئیات بالا."
             },
             {
                 title: "Stable Diffusion XL",
-                desc: "تولید تصاویر هنری و فوتورئالیستیک با جزئیات و کیفیت خیره‌کننده."
+                desc: "تولید تصاویر فوتورئالیستیک و واقعی با کنترل بالا روی جزئیات."
             },
             {
-                title: "Playground v3",
-                desc: "مدل اختصاصی برای تولید گرافیک‌های وکتور، لوگو و طرح‌های فانتزی."
-            },
-            {
-                title: "ویرایش تصویر",
-                desc: "امکان اصلاح و تغییر بخش‌هایی از تصویر تولید شده بدون ساخت مجدد."
+                title: "FLUX.1",
+                desc: "مدل نسل جدید با کیفیت خارق‌العاده در تولید تصاویر وکتور و سینمایی."
             }
         ]
     },
     {
-        category: "ابزار توسعه (Developer)",
+        category: "کانکتورها و منابع (Connectors)",
+        icon: Link2,
+        features: [
+            {
+                title: "Yelp & Maps",
+                desc: "دسترسی به داده‌های مکانی، نظرات رستوران‌ها و کسب‌وکارهای محلی."
+            },
+            {
+                title: "Wolfram|Alpha",
+                desc: "موتور محاسباتی دانش برای حل مسائل ریاضی، فیزیک و داده‌های آماری."
+            },
+            {
+                title: "LinkedIn & Jobs",
+                desc: "جستجو در پروفایل‌های حرفه‌ای، آگهی‌های شغلی و اطلاعات شرکت‌ها."
+            },
+            {
+                title: "Financial Data",
+                desc: "دسترسی به داده‌های لحظه‌ای بازار بورس، ارزهای دیجیتال و تحلیل‌های مالی (Crunchbase)."
+            }
+        ]
+    },
+    {
+        category: "قابلیت‌های جستجو (Core Search)",
+        icon: Search,
+        features: [
+            {
+                title: "Pro Search نامحدود",
+                desc: "جستجوی چندمرحله‌ای و عمیق برای سوالات پیچیده (بیش از ۳۰۰ بار در روز)."
+            },
+            {
+                title: "Deep Research",
+                desc: "تحقیق خودکار که صدها منبع را مطالعه کرده و یک گزارش جامع تولید می‌کند."
+            },
+            {
+                title: "استنادات ۱۰ برابری",
+                desc: "نمایش منابع بسیار بیشتر برای هر پاسخ جهت تضمین صحت اطلاعات."
+            },
+            {
+                title: "Academic Search",
+                desc: "حالت جستجوی اختصاصی در مقالات علمی و ژورنال‌های معتبر."
+            }
+        ]
+    },
+    {
+        category: "تحلیل داده (Data Analysis)",
+        icon: Database,
+        features: [
+            {
+                title: "آپلود نامحدود فایل",
+                desc: "امکان آپلود و تحلیل PDF, CSV و تصاویر بدون محدودیت حجمی سخت‌گیرانه."
+            },
+            {
+                title: "تحلیل دسته‌ای",
+                desc: "آپلود همزمان چندین فایل برای مقایسه و استخراج داده‌های ترکیبی."
+            },
+            {
+                title: "رونویسی (Transcription)",
+                desc: "تبدیل فایل‌های صوتی و تصویری به متن و خلاصه‌سازی محتوای آن‌ها."
+            }
+        ]
+    },
+    {
+        category: "امکانات توسعه (Developer)",
         icon: Code2,
         features: [
             {
-                title: "اعتبار API رایگان",
-                desc: "دریافت ماهانه ۵ دلار اعتبار برای استفاده از pplx-api در پروژه‌های شخصی."
+                title: "۵ دلار اعتبار API",
+                desc: "اعتبار ماهانه رایگان برای استفاده از مدل‌های Sonar در برنامه‌های شخصی."
             },
             {
                 title: "Perplexity Labs",
-                desc: "دسترسی به محیط سندباکس برای اجرای مدل‌های Open Source و تست کدها."
-            }
-        ]
-    },
-    {
-        category: "امکانات ویژه (Perks)",
-        icon: Users,
-        features: [
-            {
-                title: "Spaces پیشرفته",
-                desc: "فضاهای کاری اختصاصی با قابلیت تعریف دستورالعمل‌های خاص (Custom Instructions) برای هر پروژه."
-            },
-            {
-                title: "تسک‌های خودکار",
-                desc: "قابلیت تعریف Scheduled Tasks برای جستجوی روزانه یک موضوع و ارسال گزارش."
-            },
-            {
-                title: "تخفیف‌های شرکای تجاری",
-                desc: "دسترسی به کدهای تخفیف سرویس‌هایی مثل Uber, Notion و نرم‌افزارهای دیگر."
+                desc: "دسترسی به محیط سندباکس برای تست و اجرای مدل‌های متن‌باز."
             }
         ]
     }
@@ -126,60 +130,57 @@ const specifications = [
 
 export default function FullSpecsSection() {
     return (
-        <section className="py-20 relative bg-[#0b1120]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-24 relative bg-[#0b1120] overflow-hidden">
+            {/* Decorative Background */}
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+            
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 
-                {/* Section Header */}
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold mb-4 border border-cyan-500/20">
+                {/* Header */}
+                <div className="text-center mb-20">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-bold mb-6 border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
                         <Sparkles size={14} />
-                        مشخصات فنی کامل
+                        لیست کامل امکانات
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-black text-white">
-                        همه ابزارها در <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">یک اشتراک</span>
+                    <h2 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tight">
+                        جعبه‌ابزار نهایی <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">هوش مصنوعی</span>
                     </h2>
-                    <p className="text-gray-400 mt-4 text-sm md:text-base">
-                        برای مشاهده جزئیات دقیق هر قابلیت، نشانگر موس را روی آن نگه دارید.
+                    <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                        تمام ابزارها، مدل‌ها و قابلیت‌هایی که با اشتراک Pro در اختیار خواهید داشت.
                     </p>
                 </div>
 
                 {/* Specs Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
                     {specifications.map((spec, idx) => (
-                        <div key={idx} className="space-y-6">
+                        <div key={idx} className="space-y-6 group">
                             
                             {/* Category Header */}
-                            <div className="flex items-center gap-3 pb-4 border-b border-white/10">
-                                <div className="w-10 h-10 rounded-xl bg-[#1e293b] border border-white/10 flex items-center justify-center text-cyan-400 shadow-lg">
-                                    <spec.icon size={20} />
+                            <div className="flex items-center gap-4 pb-4 border-b border-white/10 group-hover:border-cyan-500/30 transition-colors">
+                                <div className="w-12 h-12 rounded-2xl bg-[#1e293b] border border-white/10 flex items-center justify-center text-cyan-400 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                                    <spec.icon size={24} />
                                 </div>
-                                <h3 className="text-lg font-bold text-white">{spec.category}</h3>
+                                <h3 className="text-xl font-bold text-white">{spec.category}</h3>
                             </div>
 
-                            {/* Features List */}
+                            {/* Features List with Hover Effect */}
                             <div className="flex flex-wrap gap-3">
                                 {spec.features.map((item, i) => (
-                                    <div key={i} className="group relative">
+                                    <div key={i} className="relative group/item w-full">
                                         
-                                        {/* Trigger Button */}
-                                        <div className="px-4 py-2.5 rounded-xl bg-[#1e293b] border border-white/5 text-gray-300 text-sm font-medium cursor-help hover:bg-cyan-500/10 hover:text-cyan-400 hover:border-cyan-500/30 transition-all duration-300">
-                                            {item.title}
+                                        {/* Trigger Area */}
+                                        <div className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-[#1e293b]/50 border border-white/5 hover:bg-cyan-500/10 hover:border-cyan-500/30 cursor-help transition-all duration-300">
+                                            <span className="text-gray-300 text-sm font-medium group-hover/item:text-white">{item.title}</span>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/30 group-hover/item:bg-cyan-400"></div>
                                         </div>
 
-                                        {/* Tooltip Popup */}
-                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 pointer-events-none z-50">
-                                            {/* Tooltip Arrow */}
-                                            <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0f172a]/95 border-b border-r border-white/10 rotate-45"></div>
-                                            
-                                            {/* Content */}
-                                            <div className="relative z-10">
-                                                <h4 className="text-cyan-400 font-bold text-xs mb-2 uppercase tracking-wider">{item.title}</h4>
-                                                <p className="text-gray-300 text-xs leading-relaxed text-right">
-                                                    {item.desc}
-                                                </p>
-                                            </div>
+                                        {/* Tooltip Popup (Now more robust) */}
+                                        <div className="absolute bottom-full left-0 w-full mb-2 p-4 bg-[#0f172a] border border-cyan-500/30 rounded-xl shadow-2xl opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible translate-y-2 group-hover/item:translate-y-0 transition-all duration-200 z-50 pointer-events-none">
+                                            <p className="text-cyan-400 text-xs font-bold mb-1 uppercase tracking-wider">{item.title}</p>
+                                            <p className="text-gray-300 text-xs leading-relaxed text-right">
+                                                {item.desc}
+                                            </p>
                                         </div>
-
                                     </div>
                                 ))}
                             </div>
