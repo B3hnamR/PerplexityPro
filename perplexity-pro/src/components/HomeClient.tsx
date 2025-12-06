@@ -5,8 +5,7 @@ import { useCart } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import SmartSearchDemo from "@/components/SmartSearchDemo";
-import StorySection from "@/components/StorySection"; // ✅ برگشت به طرح قبلی
-import DetailedFeatures from "@/components/DetailedFeatures"; // ✅ اضافه شدن جدول مشخصات
+import ComparisonSection from "@/components/ComparisonSection"; // ✅ کامپوننت جدید
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -43,11 +42,8 @@ export default function HomeClient({ product }: HomeClientProps) {
                     <SmartSearchDemo />
                 </div>
                 
-                {/* بخش کارت‌های شبکه ای (قدیمی) */}
-                <StorySection />
-
-                {/* بخش جدید جدول مشخصات کامل */}
-                <DetailedFeatures />
+                {/* ✅ جدول مقایسه جایگزین شد */}
+                <ComparisonSection />
                 
                 <PricingSection product={product} />
                 
