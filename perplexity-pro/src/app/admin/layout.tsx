@@ -15,7 +15,8 @@ export default async function AdminLayout({
     }
 
     return (
-        <div className="flex min-h-screen bg-[#0f172a] text-white font-sans">
+        // کلاس select-text اینجا اضافه شد تا قابلیت انتخاب متن فقط در ادمین فعال شود
+        <div className="flex min-h-screen bg-[#0f172a] text-white font-sans select-text">
             <div className="hidden lg:block w-64 flex-shrink-0">
                 <div className="fixed inset-y-0 w-64">
                     <AdminSidebar />
