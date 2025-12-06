@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import Image from "next/image";
+import Image from "next/image"; // ✅ اضافه شده برای سئو
 
-export default function CartPage() {
+export default function CartClient() {
     const { items, removeItem, updateQuantity, total, subtotal, count, discount, applyDiscount, addItem } = useCart();
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [couponCode, setCouponCode] = useState("");
@@ -66,7 +66,7 @@ export default function CartPage() {
             <Navbar onPreOrder={handlePreOrder} />
 
             <div className="pt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header with Description */}
+                {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fade-in">
                     <div>
                         <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-3">
@@ -102,8 +102,14 @@ export default function CartPage() {
                             <div className="bg-[#1e293b]/40 border border-white/5 rounded-2xl p-6">
                                 {items.map((item) => (
                                     <div key={item.id} className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/5 last:border-0 last:pb-0">
-                                        <div className="w-20 h-20 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-xl border border-white/10 flex items-center justify-center flex-shrink-0">
-                                            <Image src="/perplexity-pro-logo.png" alt="Product" className="w-16 h-auto opacity-90" onError={(e) => e.currentTarget.style.display = 'none'} />
+                                        <div className="w-20 h-20 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-xl border border-white/10 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                                            {/* ✅ استفاده از Image به جای img */}
+                                            <Image
+                                                src="/perplexity-pro-logo.png"
+                                                alt={item.name}
+                                                fill
+                                                className="object-contain opacity-90 p-2"
+                                            />
                                         </div>
                                         <div className="flex-1 text-center sm:text-right w-full">
                                             <h3 className="font-bold text-lg text-white mb-1">{item.name}</h3>

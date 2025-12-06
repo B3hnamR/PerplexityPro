@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import { ShoppingBag, CheckCircle, Clock, XCircle, ArrowLeft, Loader2, Download } from "lucide-react";
+import { ShoppingBag, CheckCircle, Clock, XCircle, Loader2, Download } from "lucide-react";
 import Link from "next/link";
 
 interface Order {
@@ -16,7 +16,7 @@ interface Order {
     downloadToken: string | null;
 }
 
-export default function ProfilePage() {
+export default function ProfileClient() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const [orders, setOrders] = useState<Order[]>([]);
@@ -54,20 +54,25 @@ export default function ProfilePage() {
         }
     };
 
+    const handlePreOrder = () => {
+        router.push("/cart");
+    };
+
     if (status === "loading" || loading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center text-cyan-400"><Loader2 className="animate-spin" size={40} /></div>;
 
     return (
         <main className="min-h-screen bg-[#0f172a] font-sans text-white pb-20">
-            <Navbar onPreOrder={() => router.push("/cart")} />
+            <Navbar onPreOrder={handlePreOrder} />
 
             <div className="pt-32 max-w-4xl mx-auto px-4">
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-3xl font-black text-white mb-2">حساب کاربری</h1>
                         <p className="text-gray-400 text-sm">تاریخچه سفارشات و لایسنس‌های شما</p>
                     </div>
-                    <div className="bg-[#1e293b] px-4 py-2 rounded-xl border border-white/10 text-sm">
-                        <span className="text-gray-400">شماره موبایل:</span> <span className="text-white font-mono dir-ltr ml-2">{session?.user?.mobile}</span>
+                    <div className="bg-[#1e293b] px-4 py-2 rounded-xl border border-white/10 text-sm flex items-center gap-2">
+                        <span className="text-gray-400">شماره موبایل:</span>
+                        <span className="text-white font-mono dir-ltr">{session?.user?.mobile}</span>
                     </div>
                 </div>
 
@@ -83,7 +88,7 @@ export default function ProfilePage() {
                             {orders.map((order) => (
                                 <div key={order.id} className="p-6 flex flex-col md:flex-row items-center justify-between gap-4 hover:bg-white/5 transition-colors">
                                     <div className="flex items-center gap-4 w-full md:w-auto">
-                                        <div className="w-12 h-12 rounded-full bg-[#0f172a] flex items-center justify-center border border-white/10 text-gray-400 font-bold text-lg">
+                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center border border-white/10 font-bold text-lg ${order.status === 'PAID' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-[#0f172a] text-gray-400'}`}>
                                             {order.status === 'PAID' ? '✓' : '#'}
                                         </div>
                                         <div>

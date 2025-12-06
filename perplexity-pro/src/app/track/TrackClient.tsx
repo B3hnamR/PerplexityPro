@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Lock, ArrowRight, Smartphone, Loader2, AlertCircle } from "lucide-react";
+import { Search, Lock, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import DeliveryClient from "../delivery/[token]/DeliveryClient";
 
-export default function TrackOrderPage() {
+export default function TrackClient() {
     const [step, setStep] = useState(1);
     const [trackingCode, setTrackingCode] = useState("");
     const [mobileMasked, setMobileMasked] = useState("");
@@ -94,7 +94,6 @@ export default function TrackOrderPage() {
                         <form onSubmit={handleVerifyOtp} className="space-y-6 animate-fade-in">
                             <div className="text-center bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4">
                                 <p className="text-sm text-cyan-300 mb-2">کد تایید به شماره زیر ارسال شد:</p>
-                                {/* اصلاح: استفاده از dir="ltr" برای نمایش صحیح ترتیب اعداد */}
                                 <p className="text-xl font-bold font-mono text-white" dir="ltr">{mobileMasked}</p>
                             </div>
 
@@ -133,7 +132,6 @@ export default function TrackOrderPage() {
                             {orderData.links && orderData.links.length > 0 ? (
                                 <DeliveryClient links={orderData.links} />
                             ) : (
-                                // متن اصلاح شده
                                 <div className="text-center text-yellow-400 p-6 bg-yellow-500/10 rounded-xl border border-yellow-500/20 flex flex-col items-center gap-3">
                                     <AlertCircle className="animate-pulse" size={32} />
                                     <p className="font-bold text-lg">لینک فعال‌سازی هنوز صادر نشده است.</p>
