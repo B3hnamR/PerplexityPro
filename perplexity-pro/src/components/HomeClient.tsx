@@ -5,7 +5,7 @@ import { useCart } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import SmartSearchDemo from "@/components/SmartSearchDemo";
-import StorySection from "@/components/StorySection"; // Features section
+import ProFeatures from "@/components/ProFeatures"; // ✅ کامپوننت جدید
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -21,11 +21,13 @@ export default function HomeClient({ product }: HomeClientProps) {
     const router = useRouter();
 
     const handlePreOrder = () => {
-        addItem({
-            id: product?.id || "perplexity-pro-1year",
-            name: product?.name || "Perplexity Pro Subscription",
-            price: product?.price || 398000
-        });
+        if (product) {
+            addItem({
+                id: product.id,
+                name: product.name,
+                price: product.price
+            });
+        }
         router.push("/cart");
     };
 
@@ -36,12 +38,12 @@ export default function HomeClient({ product }: HomeClientProps) {
             <div className="space-y-0">
                 <Hero onPreOrder={handlePreOrder} />
                 
-                {/* Add some spacing or dividers if needed between sections */}
                 <div className="relative z-20">
                     <SmartSearchDemo />
                 </div>
                 
-                <StorySection />
+                {/* ✅ جایگزین شده */}
+                <ProFeatures />
                 
                 <PricingSection product={product} />
                 
