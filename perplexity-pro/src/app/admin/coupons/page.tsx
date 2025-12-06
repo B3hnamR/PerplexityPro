@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Ticket, Loader2, Edit2, Save, X, User } from "lucide-react";
+import { Plus, Trash2, Ticket, Loader2, Edit2, X } from "lucide-react";
 import axios from "axios";
 
 export default function CouponsPage() {
@@ -17,7 +17,7 @@ export default function CouponsPage() {
         minOrderPrice: 0,
         maxDiscount: 0,
         maxUses: 0,
-        maxUsesPerUser: 0, // ✅ اضافه شد
+        maxUsesPerUser: 0, // ✅
         isActive: true
     });
 

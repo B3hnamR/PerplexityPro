@@ -23,7 +23,6 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { id, ...data } = body;
 
-        // تبدیل مقادیر عددی برای اطمینان
         const processedData = {
             code: data.code,
             type: data.type,
@@ -31,21 +30,17 @@ export async function POST(req: Request) {
             minOrderPrice: Number(data.minOrderPrice) || null,
             maxDiscount: Number(data.maxDiscount) || null,
             maxUses: Number(data.maxUses) || null,
-            maxUsesPerUser: Number(data.maxUsesPerUser) || null, // ✅ اضافه شد
+            maxUsesPerUser: Number(data.maxUsesPerUser) || null, // ✅ دریافت فیلد جدید
             isActive: data.isActive
         };
 
-        // اگر ID داشتیم یعنی آپدیت
         if (id) {
             const updated = await prisma.discountCode.update({
                 where: { id },
                 data: processedData
             });
             return NextResponse.json(updated);
-        }
-
-        // اگر ID نداشتیم یعنی جدید
-        else {
+        } else {
             const validation = couponSchema.safeParse(processedData);
             if (!validation.success) return NextResponse.json({ error: "داده نامعتبر" }, { status: 400 });
 
