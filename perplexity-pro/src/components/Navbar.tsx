@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Menu, X, Brain, User, LogOut, ChevronDown, LayoutDashboard, ShoppingCart, ListOrdered } from "lucide-react";
+import { Menu, X, Brain, User, LogOut, ChevronDown, LayoutDashboard, ShoppingCart, ListOrdered, Phone } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/context/CartContext";
 import CheckoutModal from "./CheckoutModal";
@@ -44,21 +44,24 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
                     <div className="flex items-center justify-between h-20">
 
                         {/* Logo */}
-                        <div className="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+                        <Link href="/" className="flex-shrink-0 flex items-center gap-2 cursor-pointer">
                             <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center text-white font-bold transform rotate-45 shadow-[0_0_15px_rgba(6,182,212,0.5)]">
                                 <div className="-rotate-45"><Brain size={20} /></div>
                             </div>
                             <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 tracking-wider">
                                 PERPLEXITY <span className="text-cyan-400">PRO</span>
                             </span>
-                        </div>
+                        </Link>
 
-                        {/* Desktop Menu */}
+                        {/* Desktop Menu - ✅ لینک تماس با ما اضافه شد */}
                         <div className="hidden md:block">
                             <div className="ml-10 flex items-baseline space-x-8 space-x-reverse text-sm font-medium">
                                 <Link href="/#features" className="text-gray-300 hover:text-cyan-400 transition-colors px-3 py-2">ویژگی‌ها</Link>
-                                <Link href="/track" className="text-gray-300 hover:text-cyan-400 transition-colors px-3 py-2">پیگیری سفارش</Link>
                                 <Link href="/#pricing" className="text-gray-300 hover:text-cyan-400 transition-colors px-3 py-2">قیمت‌ها</Link>
+                                <Link href="/track" className="text-gray-300 hover:text-cyan-400 transition-colors px-3 py-2">پیگیری سفارش</Link>
+                                <Link href="/contact" className="text-gray-300 hover:text-cyan-400 transition-colors px-3 py-2 flex items-center gap-1">
+                                    <Phone size={14} /> تماس با ما
+                                </Link>
                             </div>
                         </div>
 
@@ -90,7 +93,6 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
                                     {/* Dropdown Menu */}
                                     {isUserMenuOpen && (
                                         <div className="absolute left-0 mt-2 w-56 bg-[#1e293b] border border-white/10 rounded-xl shadow-xl overflow-hidden animate-fade-in-up origin-top-left z-50">
-                                            {/* لینک پنل مدیریت (فقط برای ادمین) */}
                                             {(session.user as any).role === "ADMIN" && (
                                                 <Link href="/admin/dashboard" className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-cyan-400 transition-colors">
                                                     <LayoutDashboard size={16} />
@@ -98,7 +100,6 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
                                                 </Link>
                                             )}
 
-                                            {/* ✅ لینک جدید حساب کاربری */}
                                             <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-cyan-400 transition-colors">
                                                 <ListOrdered size={16} />
                                                 سفارش‌های من
@@ -148,6 +149,25 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile Menu Content (دراپ‌داون موبایل) */}
+                {isOpen && (
+                    <div className="md:hidden bg-[#0f172a] border-b border-white/10 px-4 pt-2 pb-4 space-y-2 animate-fade-in">
+                        <Link href="/#features" className="block text-gray-300 py-2 hover:text-cyan-400" onClick={() => setIsOpen(false)}>ویژگی‌ها</Link>
+                        <Link href="/#pricing" className="block text-gray-300 py-2 hover:text-cyan-400" onClick={() => setIsOpen(false)}>قیمت‌ها</Link>
+                        <Link href="/track" className="block text-gray-300 py-2 hover:text-cyan-400" onClick={() => setIsOpen(false)}>پیگیری سفارش</Link>
+                        <Link href="/contact" className="block text-gray-300 py-2 hover:text-cyan-400" onClick={() => setIsOpen(false)}>تماس با ما</Link>
+
+                        {!session && (
+                            <button
+                                onClick={() => { setIsLoginModalOpen(true); setIsOpen(false); }}
+                                className="w-full mt-4 bg-cyan-600 text-white py-3 rounded-xl font-bold"
+                            >
+                                ورود / عضویت
+                            </button>
+                        )}
+                    </div>
+                )}
             </nav>
 
             <CheckoutModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} mode="LOGIN_ONLY" />

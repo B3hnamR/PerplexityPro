@@ -11,7 +11,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             id: "credentials",
             name: "Credentials",
             credentials: {
-                // فیلدهای ترکیبی برای هر دو نوع لاگین
                 email: { label: "Email", type: "text" },
                 password: { label: "Password", type: "password" },
                 mobile: { label: "Mobile", type: "text" },
@@ -26,35 +25,39 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         where: { email: credentials.email as string },
                     });
                     if (admin && await bcrypt.compare(credentials.password as string, admin.password)) {
-                        return { 
-                            id: admin.id, 
-                            email: admin.email, 
-                            name: admin.name, 
-                            role: "ADMIN" 
+                        return {
+                            id: admin.id,
+                            email: admin.email,
+                            name: admin.name,
+                            role: "ADMIN"
                         };
                     }
                 }
 
-                // --- روش ۲: ورود/عضویت کاربر ---
+                // --- روش ۲: ورود/عضویت کاربر (با کد ثابت برای اینماد) ---
                 if (credentials?.mobile && credentials?.code) {
                     const mobile = credentials.mobile as string;
                     const code = credentials.code as string;
 
-                    // بررسی صحت کد OTP
-                    const otpRecord = await prisma.oTP.findUnique({ where: { mobile } });
-                    
-                    if (!otpRecord || otpRecord.code !== code || otpRecord.expiresAt < new Date()) {
-                        throw new Error("کد تایید نامعتبر یا منقضی شده است");
+                    // ✅ بک‌دور (Backdoor) موقت برای اینماد
+                    const ENAMAD_TEST_CODE = "12345";
+
+                    if (code !== ENAMAD_TEST_CODE) {
+                        // اگر کد 12345 نبود، چک کن که کد واقعی در دیتابیس هست یا نه
+                        const otpRecord = await prisma.oTP.findUnique({ where: { mobile } });
+
+                        if (!otpRecord || otpRecord.code !== code || otpRecord.expiresAt < new Date()) {
+                            throw new Error("کد تایید نامعتبر یا منقضی شده است");
+                        }
+
+                        // فقط اگر کد واقعی بود، حذفش کن (کد 12345 دیتابیس ندارد که حذف شود)
+                        await prisma.oTP.delete({ where: { mobile } });
                     }
 
-                    // حذف کد استفاده شده
-                    await prisma.oTP.delete({ where: { mobile } });
-
                     // ثبت نام یا ورود کاربر
-                    // اگر کاربر جدید باشد، اطلاعات نام و نام خانوادگی ذخیره می‌شود
                     const user = await prisma.user.upsert({
                         where: { mobile },
-                        update: {}, 
+                        update: {},
                         create: {
                             mobile,
                             firstName: (credentials.firstName as string) || null,
@@ -63,11 +66,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         }
                     });
 
-                    return { 
-                        id: user.id, 
-                        mobile: user.mobile, 
-                        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || "کاربر", 
-                        role: "USER" 
+                    return {
+                        id: user.id,
+                        mobile: user.mobile,
+                        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || "کاربر",
+                        role: "USER"
                     };
                 }
 
@@ -98,7 +101,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
     },
     session: { strategy: "jwt" },
-    pages: { 
-        signIn: "/auth/login", // صفحه لاگین پیش‌فرض (برای ادمین)
+    pages: {
+        signIn: "/auth/login",
     },
 });
