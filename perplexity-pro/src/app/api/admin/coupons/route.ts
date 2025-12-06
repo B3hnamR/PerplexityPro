@@ -23,42 +23,39 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { id, ...data } = body;
 
+        // تبدیل مقادیر عددی برای اطمینان
+        const processedData = {
+            code: data.code,
+            type: data.type,
+            value: Number(data.value),
+            minOrderPrice: Number(data.minOrderPrice) || null,
+            maxDiscount: Number(data.maxDiscount) || null,
+            maxUses: Number(data.maxUses) || null,
+            maxUsesPerUser: Number(data.maxUsesPerUser) || null, // ✅ اضافه شد
+            isActive: data.isActive
+        };
+
         // اگر ID داشتیم یعنی آپدیت
         if (id) {
             const updated = await prisma.discountCode.update({
                 where: { id },
-                data: {
-                    code: data.code,
-                    type: data.type,
-                    value: Number(data.value),
-                    minOrderPrice: Number(data.minOrderPrice) || null,
-                    maxDiscount: Number(data.maxDiscount) || null,
-                    maxUses: Number(data.maxUses) || null,
-                    isActive: data.isActive
-                }
+                data: processedData
             });
             return NextResponse.json(updated);
-        } 
-        
+        }
+
         // اگر ID نداشتیم یعنی جدید
         else {
-            const validation = couponSchema.safeParse(data);
+            const validation = couponSchema.safeParse(processedData);
             if (!validation.success) return NextResponse.json({ error: "داده نامعتبر" }, { status: 400 });
 
             const created = await prisma.discountCode.create({
-                data: {
-                    code: data.code,
-                    type: data.type,
-                    value: data.value,
-                    minOrderPrice: data.minOrderPrice,
-                    maxDiscount: data.maxDiscount,
-                    maxUses: data.maxUses,
-                    isActive: data.isActive
-                }
+                data: processedData
             });
             return NextResponse.json(created);
         }
     } catch (error) {
+        console.error(error);
         return NextResponse.json({ error: "Error" }, { status: 400 });
     }
 }
@@ -69,8 +66,8 @@ export async function DELETE(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    if(!id) return NextResponse.json({error: "ID Required"}, {status:400});
-    
+    if (!id) return NextResponse.json({ error: "ID Required" }, { status: 400 });
+
     await prisma.discountCode.delete({ where: { id } });
     return NextResponse.json({ success: true });
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Menu, X, Brain, User, LogOut, ChevronDown, LayoutDashboard, ShoppingCart } from "lucide-react";
+import { Menu, X, Brain, User, LogOut, ChevronDown, LayoutDashboard, ShoppingCart, ListOrdered } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/context/CartContext";
 import CheckoutModal from "./CheckoutModal";
@@ -23,7 +23,7 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
-        
+
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsUserMenuOpen(false);
@@ -42,7 +42,7 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
             <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#0f172a]/90 backdrop-blur-md border-b border-white/10 shadow-lg' : 'bg-transparent'}`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
-                        
+
                         {/* Logo */}
                         <div className="flex-shrink-0 flex items-center gap-2 cursor-pointer">
                             <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center text-white font-bold transform rotate-45 shadow-[0_0_15px_rgba(6,182,212,0.5)]">
@@ -76,7 +76,7 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
 
                             {session ? (
                                 <div className="relative" ref={dropdownRef}>
-                                    <button 
+                                    <button
                                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                                         className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-2 rounded-xl font-medium transition-all"
                                     >
@@ -89,21 +89,29 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
 
                                     {/* Dropdown Menu */}
                                     {isUserMenuOpen && (
-                                        <div className="absolute left-0 mt-2 w-48 bg-[#1e293b] border border-white/10 rounded-xl shadow-xl overflow-hidden animate-fade-in-up origin-top-left z-50">
+                                        <div className="absolute left-0 mt-2 w-56 bg-[#1e293b] border border-white/10 rounded-xl shadow-xl overflow-hidden animate-fade-in-up origin-top-left z-50">
+                                            {/* لینک پنل مدیریت (فقط برای ادمین) */}
                                             {(session.user as any).role === "ADMIN" && (
                                                 <Link href="/admin/dashboard" className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-cyan-400 transition-colors">
                                                     <LayoutDashboard size={16} />
                                                     پنل مدیریت
                                                 </Link>
                                             )}
+
+                                            {/* ✅ لینک جدید حساب کاربری */}
+                                            <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-cyan-400 transition-colors">
+                                                <ListOrdered size={16} />
+                                                سفارش‌های من
+                                            </Link>
+
                                             {(session.user as any).role !== "ADMIN" && (
-                                                 <button onClick={onPreOrder} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-cyan-400 transition-colors text-right">
+                                                <button onClick={onPreOrder} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-cyan-400 transition-colors text-right">
                                                     <User size={16} />
                                                     خرید اشتراک جدید
                                                 </button>
                                             )}
                                             <div className="border-t border-white/5 my-1"></div>
-                                            <button 
+                                            <button
                                                 onClick={() => signOut()}
                                                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-right"
                                             >
@@ -114,8 +122,8 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
                                     )}
                                 </div>
                             ) : (
-                                <button 
-                                    onClick={() => setIsLoginModalOpen(true)} 
+                                <button
+                                    onClick={() => setIsLoginModalOpen(true)}
                                     className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all transform hover:scale-105"
                                 >
                                     <User size={18} />
@@ -141,7 +149,7 @@ export default function Navbar({ onPreOrder }: NavbarProps) {
                     </div>
                 </div>
             </nav>
-            
+
             <CheckoutModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} mode="LOGIN_ONLY" />
         </>
     );
