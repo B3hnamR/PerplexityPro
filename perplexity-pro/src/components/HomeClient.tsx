@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import SmartSearchDemo from "@/components/SmartSearchDemo";
 import ComparisonSection from "@/components/ComparisonSection";
-import FullSpecsSection from "@/components/FullSpecsSection"; // ✅ بخش جدید
+import FullSpecsSection from "@/components/FullSpecsSection";
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -43,9 +43,10 @@ export default function HomeClient({ product }: HomeClientProps) {
                     <SmartSearchDemo />
                 </div>
                 
+                {/* جدول مقایسه */}
                 <ComparisonSection />
 
-                {/* ✅ لیست کامل مشخصات جایگزین بخش‌های قدیمی شد */}
+                {/* مشخصات فنی کامل (جایگزین بخش قدیمی) */}
                 <FullSpecsSection />
                 
                 <PricingSection product={product} />
